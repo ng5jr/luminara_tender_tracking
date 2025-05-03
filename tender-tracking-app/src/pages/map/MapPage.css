@@ -1,0 +1,74 @@
+MapPage.css body {
+  font-family: "Big Caslon", "Times New Roman", serif;
+}
+
+.map-page {
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100vh;
+  /* Full viewport height */
+  width: 100vw;
+  /* Full viewport width */
+  background-color: #222;
+  /* Dark background */
+  color: #fff;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+
+.map-page h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #fff;
+  font-size: 1.5em;
+}
+
+.map-container {
+  max-width: 50%;
+  height: 80%;
+  /* Adjust as needed */
+}
+
+.mapPage h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  /* Reduced margin */
+  color: #fff;
+  font-size: 2em;
+  /* Smaller heading for mobile */
+  font-weight: 500;
+}
+
+.map-icon-containers {
+  width: 20px;
+  height: 20px;
+  padding: 10px;
+  border-radius: 100%;
+  background-color: white;
+  position: absolute;
+  right: 35px;
+  top: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-icon {
+  width: 30px;
+  height: 30px;
+}
+
+@media screen and (max-width: 600px) {
+ 
+  .map-icon-containers {
+    width: 20px;
+    height: 20px;
+    right: 15px;
+    top: 20px;
+    /* Adjusted position for mobile */
+  }
+}

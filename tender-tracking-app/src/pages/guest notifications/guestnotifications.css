@@ -1,0 +1,222 @@
+/* GuestNotifications.css - Mobile Only */
+body {
+  box-sizing: border-box;
+  background-color: black;
+}
+
+.guest-notifications {
+  font-family: 'Big Caslon', 'Times New Roman', serif;
+  margin: 10px auto;
+  /* Reduced margin for mobile */
+  padding: 45px 35px;
+  /* Reduced padding for mobile */
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  /* Slightly smaller radius for mobile */
+  background-color: #222;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  /* Less pronounced shadow */
+  max-width: 800px;
+  /* Take up full width on mobile */
+  position: relative;
+}
+
+.guest-notifications h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  /* Reduced margin */
+  color: #fff;
+  font-size: 2em;
+  /* Smaller heading for mobile */
+  font-weight: 500;
+}
+
+.notification-list {
+  border-radius: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+
+}
+
+.notification-item {
+  border-bottom: 1px solid #555;
+  padding: 10px;
+  /* Reduced padding */
+  transition: background-color 0.3s ease, text-align 0.3s ease;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-message {
+  font-weight: 500;
+  font-size: 1.2em;
+  /* Smaller font size for mobile */
+  color: #fff;
+  margin-bottom: 3px;
+  /* Reduced margin */
+}
+
+.notification-time {
+  font-size: 1em;
+  /* Smaller font size for mobile */
+  color: #aaa;
+}
+
+/* New Styles for Shoreside and Shipside */
+
+.shoreside-notification {
+  background-color: rgba(220, 128, 53, 0.2);
+
+  text-align: center;
+}
+
+.shipside-notification {
+  background-color: rgba(0, 123, 255, 0.2);
+  text-align: center;
+}
+
+.custom-notification {
+  background-color: rgba(7, 255, 52, 0.116);
+  text-align: center;
+}
+
+.blinking-notification {
+  animation: blinker 1s linear 2;
+  /* Blink 3 times */
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
+
+@keyframes pulse-animation {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.feedback-icon-container {
+  padding: 10px;
+  border-radius: 100%;
+  background-color: white;
+  position: absolute;
+  right: 35px;
+  top: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  /* Ensure cursor is a pointer */
+  animation: pulse-animation 2s infinite;
+  /* Apply the animation */
+  transition: background-color 0.2s;
+  /* Add a transition for background-color */
+  width: 25px;
+  height: 25px;
+  background-image: linear-gradient(#f7f8fa, #e7e9ec);
+  box-shadow: rgba(255, 255, 255, .6) 0 1px 0 inset;
+}
+
+.feedback-icon-container:hover {
+  background-color: #f0f0f0;
+  /* Slightly lighter background on hover */
+}
+
+.feedback-icon-container:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  animation: none;
+  /* Disable animation when disabled */
+}
+
+
+.volume-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.rating-icon {
+  width: 25px;
+  height: 25px;
+}
+
+.volume {
+  width: 25px;
+  height: 25px;
+  padding: 10px;
+  border-radius: 100%;
+  background-image: linear-gradient(#f7f8fa, #e7e9ec);
+  box-shadow: rgba(255, 255, 255, .6) 0 1px 0 inset;
+  position: absolute;
+  left: 35px;
+  top: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 600px) {
+  .guest-notifications {
+    padding: 20px 15px;
+    /* Further reduced padding for mobile */
+    margin: 5px auto;
+    /* Further reduced margin for mobile */
+  }
+
+  .guest-notifications h2 {
+    font-size: 1.5em;
+    /* Smaller heading for mobile */
+  }
+
+  .notification-item {
+    padding: 8px;
+    /* Further reduced padding */
+  }
+
+  .notification-message {
+    font-size: 1em;
+    /* Further reduced font size for mobile */
+  }
+
+  .notification-time {
+    font-size: 0.9em;
+    /* Further reduced font size for mobile */
+  }
+
+  .feedback-icon-container {
+    width: 20px;
+    height: 20px;
+    right: 15px;
+    top: 20px;
+    /* Adjusted position for mobile */
+  }
+
+  .volume {
+    width: 20px;
+    height: 20px;
+    left: 15px;
+    top: 20px;
+    /* Adjusted position for mobile */
+  }
+
+}
