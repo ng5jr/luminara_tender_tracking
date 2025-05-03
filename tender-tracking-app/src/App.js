@@ -10,8 +10,12 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<GuestNotifications />} />
-        <Route path="/map" element={<MapPage />} /> 
+        {/* <Route path="/map" element={<MapPage />} />  */}
         <Route path="/feedback" element={<Rating />} />
+        <Route
+          path="*"
+          element={<div className="not-found">Page Not Found</div>}
+        />
       </Routes>
     </BrowserRouter>
   );
