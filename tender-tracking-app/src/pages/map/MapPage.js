@@ -5,7 +5,7 @@ import './MapPage.css';
 import { Link } from 'react-router-dom';
 import back from '../../assets/back.png'; // Try this import
 import L from 'leaflet';
-import boat from '../../assets/boat.png'; 
+import boat from '../../assets/boat.png';
 import Logo from '../../components/logo';
 
 const defaultPosition = [26.1340261, -80.0945339];
@@ -22,17 +22,17 @@ const myIcon = L.icon({
 const MyMap = () => {
   return (
     <div className="guest-notifications">
-    <Logo />
-     
-        <Link to="/">
-          <div className="map-icon-containers">
-            <img src={back} alt="View Tender Map" className="map-icon" />
-          </div>
-        </Link>
-       
-    
+      <Logo />
+
+      <Link to="/">
+        <div className="map-icon-containers">
+          <img src={back} alt="View Tender Map" className="map-icon" />
+        </div>
+      </Link>
+
+
       <h2>TENDER TRACKING MAP</h2>
-     
+
       <MapContainer
         center={defaultPosition}
         zoom={13}
@@ -45,7 +45,7 @@ const MyMap = () => {
         />
         <Marker position={defaultPosition} icon={myIcon}>
           <Popup>
-            Ilma
+            Evrima
           </Popup>
         </Marker>
       </MapContainer>
