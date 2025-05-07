@@ -18,8 +18,9 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
+  "start_url": "/?source=pwa",
   "display": "fullscreen",
+  "orientation": "portrait-primary",
   "theme_color": "#000000",
   "background_color": "#ffffff"
 }
