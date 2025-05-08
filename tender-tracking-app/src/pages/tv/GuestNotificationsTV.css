@@ -1,0 +1,331 @@
+/* GuestNotifications.css - Mobile Only */
+body {
+    box-sizing: border-box;
+    background-color: black;
+    margin: 0 !important;
+}
+
+.guest-notificationstv {
+    font-family: 'Big Caslon', 'Times New Roman', serif;
+    margin: none;
+    /* Reduced margin for mobile */
+    padding: 45px 35px;
+    /* Reduced padding for mobile */
+    border: 1px solid #e6e6e6;
+    border-radius: 0;
+    /* Slightly smaller radius for mobile */
+    background-color: #222;
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    /* Less pronounced shadow */
+    max-width: 500px;
+    /* Take up full width on mobile */
+    position: relative;
+    flex: 1;
+    padding: 20px;
+    overflow-y: hidden;
+    max-width: none;
+    border-bottom: none;
+    border-top: none;
+}
+
+.guest-notificationstv h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    /* Reduced margin */
+    color: #fff;
+    font-size: 2em;
+    /* Smaller heading for mobile */
+    font-weight: 500;
+}
+
+.notification-list {
+    border-radius: 10px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+
+}
+
+.notification-item {
+    border-bottom: 1px solid #555;
+    padding: 10px;
+    /* Reduced padding */
+    transition: background-color 0.3s ease, text-align 0.3s ease;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-message {
+    font-weight: 500;
+    font-size: 1.2em;
+    /* Smaller font size for mobile */
+    color: #fff;
+    margin-bottom: 3px;
+    /* Reduced margin */
+}
+
+.notification-time {
+    font-size: 1em;
+    /* Smaller font size for mobile */
+    color: #aaa;
+}
+
+/* New Styles for Shoreside and Shipside */
+
+.shoreside-notification {
+    background-color: rgba(220, 128, 53, 0.2);
+
+    text-align: center;
+}
+
+.shipside-notification {
+    background-color: rgba(0, 123, 255, 0.2);
+    text-align: center;
+}
+
+.custom-notification {
+    background-color: rgba(7, 255, 52, 0.116);
+    text-align: center;
+}
+
+.blinking-notification {
+    animation: blinker 1s linear 2;
+    /* Blink 3 times */
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}
+
+
+@keyframes pulse-animation {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.feedback-icon-container {
+    padding: 10px;
+    border-radius: 100%;
+    background-color: white;
+    position: absolute;
+    right: 35px;
+    top: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    /* Ensure cursor is a pointer */
+    animation: pulse-animation 2s infinite;
+    /* Apply the animation */
+    transition: background-color 0.2s;
+    /* Add a transition for background-color */
+    width: 25px;
+    height: 25px;
+    background-image: linear-gradient(#f7f8fa, #e7e9ec);
+    box-shadow: rgba(255, 255, 255, .6) 0 1px 0 inset;
+}
+
+.feedback-icon-container:hover {
+    background-color: #f0f0f0;
+    /* Slightly lighter background on hover */
+}
+
+.feedback-icon-container:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    animation: none;
+    /* Disable animation when disabled */
+}
+
+
+.volume-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.rating-icon {
+    width: 25px;
+    height: 25px;
+}
+
+.volume {
+    width: 25px;
+    height: 25px;
+    padding: 10px;
+    border-radius: 100%;
+    background-image: linear-gradient(#f7f8fa, #e7e9ec);
+    box-shadow: rgba(255, 255, 255, .6) 0 1px 0 inset;
+    position: absolute;
+    left: 35px;
+    top: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 600px) {
+    .guest-notificationstv {
+        padding: 20px 15px;
+        /* Further reduced padding for mobile */
+        margin: 5px auto;
+        /* Further reduced margin for mobile */
+    }
+
+    .guest-notificationstv h2 {
+        font-size: 1.5em;
+        /* Smaller heading for mobile */
+    }
+
+    .notification-item {
+        padding: 8px;
+        /* Further reduced padding */
+    }
+
+    .notification-message {
+        font-size: 1em;
+        /* Further reduced font size for mobile */
+    }
+
+    .notification-time {
+        font-size: 0.9em;
+        /* Further reduced font size for mobile */
+    }
+
+    .feedback-icon-container {
+        width: 20px;
+        height: 20px;
+        right: 15px;
+        top: 20px;
+        /* Adjusted position for mobile */
+    }
+
+    .volume {
+        width: 20px;
+        height: 20px;
+        left: 15px;
+        top: 20px;
+        /* Adjusted position for mobile */
+    }
+
+}
+
+.tv-layout {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    background-color: black;
+    color: white;
+}
+
+.image-section {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border-right: none;
+}
+
+.image-section.full-screen {
+    flex: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.image-section.full-screen h2,
+.image-section.full-screen input {
+    display: none;
+}
+
+/* Fix the image container to ensure proper sizing */
+.image-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    /* Prevent overflow */
+    position: relative;
+}
+
+/* .image-container:after {
+    content: "Click to toggle view mode";
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+  } */
+
+.image-container:hover:after {
+    opacity: 1;
+}
+
+/* Remove the duplicate .image-container img style at the bottom and use this single definition */
+.image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Add object-position to control which part of the image is shown */
+    object-position: right;
+    /* Show the top part of the image */
+    border: none;
+    border-radius: 0;
+}
+
+/* Base styles for both image display modes */
+.image-container img {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+    /* Add pointer cursor to indicate it's clickable */
+    transition: all 0.3s ease;
+}
+
+/* Contain mode - shows the entire image */
+img.image-contain {
+    object-fit: contain;
+    object-position: right;
+}
+
+/* Cover mode - fills the container */
+img.image-cover {
+    object-fit: cover;
+    object-position: right;
+    /* You can adjust this to control which part is shown */
+}
+
+.image-section h2 {
+    margin-bottom: 20px;
+}
