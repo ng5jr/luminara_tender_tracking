@@ -5,13 +5,16 @@ import notificationSound from "../../assets/notification.mp3";
 
 import "./GuestNotificationsTV.css";
 import Logo from "../../components/logo.js";
-
+import FullScren from "../../assets/fullscreen.png"; // Adjust path if needed
+import Minimize from "../../assets/minimize.png"; // Adjust path if needed
 function GuestNotificationsTV() {
     const [notifications, setNotifications] = useState([]);
     const [latestNotificationId, setLatestNotificationId] = useState(null);
     const [uploadedImage, setUploadedImage] = useState(null);
     const [isImageUploaded, setIsImageUploaded] = useState(false); // New state
     const [imageDisplayMode, setImageDisplayMode] = useState('contain'); // New state
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const tvLayoutRef = useRef(null);
     const audioRef = useRef(null);
     // const [soundEnabled, setIsSoundEnabled] = useState(false);
 
@@ -87,12 +90,66 @@ function GuestNotificationsTV() {
         setImageDisplayMode(prevMode => prevMode === 'contain' ? 'cover' : 'contain');
     };
 
+    const toggleFullscreen = () => {
+        if (!document.fullscreenElement) {
+            // Enter fullscreen
+            if (tvLayoutRef.current.requestFullscreen) {
+                tvLayoutRef.current.requestFullscreen()
+                    .then(() => setIsFullscreen(true))
+                    .catch(err => console.error(`Error attempting to enable fullscreen: ${err.message}`));
+            } else if (tvLayoutRef.current.mozRequestFullScreen) { /* Firefox */
+                tvLayoutRef.current.mozRequestFullScreen();
+                setIsFullscreen(true);
+            } else if (tvLayoutRef.current.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+                tvLayoutRef.current.webkitRequestFullscreen();
+                setIsFullscreen(true);
+            } else if (tvLayoutRef.current.msRequestFullscreen) { /* IE/Edge */
+                tvLayoutRef.current.msRequestFullscreen();
+                setIsFullscreen(true);
+            }
+        } else {
+            // Exit fullscreen
+            if (document.exitFullscreen) {
+                document.exitFullscreen()
+                    .then(() => setIsFullscreen(false))
+                    .catch(err => console.error(`Error attempting to exit fullscreen: ${err.message}`));
+            } else if (document.mozCancelFullScreen) { /* Firefox */
+                document.mozCancelFullScreen();
+                setIsFullscreen(false);
+            } else if (document.webkitExitFullscreen) { /* Chrome, Safari & Opera */
+                document.webkitExitFullscreen();
+                setIsFullscreen(false);
+            } else if (document.msExitFullscreen) { /* IE/Edge */
+                document.msExitFullscreen();
+                setIsFullscreen(false);
+            }
+        }
+    };
+
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            setIsFullscreen(!!document.fullscreenElement);
+        };
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+        return () => {
+            document.removeEventListener('fullscreenchange', handleFullscreenChange);
+            document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+            document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+            document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+        };
+    }, []);
+
     const getLast10Notifications = () => {
         return notifications.slice(0, 10);
     };
 
     return (
-        <div className="tv-layout">
+        <div className="tv-layout" ref={tvLayoutRef}>
             {/* Left side: Image upload and display */}
             <div className={`image-section ${isImageUploaded ? "full-screen" : ""}`}>
                 {!isImageUploaded && (
@@ -129,6 +186,14 @@ function GuestNotificationsTV() {
         </div> */}
                 <Logo />
                 <h2>TENDER STATUS NOTIFICATIONS</h2>
+                <div onClick={toggleFullscreen} className="screen-toggle">
+                    {!isFullscreen ? (
+                        <img src={FullScren} alt="fulscreen" className="screen-icon" />
+                    ) : (
+                        <img src={Minimize} alt="minimize" className="screen-icon" />
+                    )}
+                </div>
+
                 <audio
                     ref={audioRef}
                     src={notificationSound}

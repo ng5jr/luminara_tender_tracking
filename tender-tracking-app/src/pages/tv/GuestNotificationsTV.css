@@ -156,7 +156,7 @@ body {
 }
 
 
-.volume-icon {
+.screen-icon {
     width: 20px;
     height: 20px;
 }
@@ -166,21 +166,24 @@ body {
     height: 25px;
 }
 
-.volume {
-    width: 25px;
-    height: 25px;
+.screen-toggle {
+    width: 15px;
+    height: 15px;
     padding: 10px;
     border-radius: 100%;
     background-image: linear-gradient(#f7f8fa, #e7e9ec);
     box-shadow: rgba(255, 255, 255, .6) 0 1px 0 inset;
     position: absolute;
-    left: 35px;
-    top: 40px;
+    right: 35px;
+    top: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    opacity: 0.2;
 }
+
+
 
 @media screen and (max-width: 600px) {
     .guest-notificationstv {
@@ -218,7 +221,7 @@ body {
         /* Adjusted position for mobile */
     }
 
-    .volume {
+    .screen-toggle {
         width: 20px;
         height: 20px;
         left: 15px;
