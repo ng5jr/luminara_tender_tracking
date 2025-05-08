@@ -32,34 +32,38 @@ function GuestNotifications() {
   }, [soundEnabled]);
 
   useEffect(() => {
-    const notificationsColRef = collection(db, "guestNotifications");
-    const q = query(notificationsColRef, orderBy("timestamp", "desc"));
+    const initializeListener = () => {
+      const notificationsColRef = collection(db, "guestNotifications");
+      const q = query(notificationsColRef, orderBy("timestamp", "desc"));
 
-    const unsubscribe = onSnapshot(
-      q,
-      (querySnapshot) => {
-        const notificationsData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setNotifications(notificationsData);
+      return onSnapshot(
+        q,
+        (querySnapshot) => {
+          const notificationsData = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setNotifications(notificationsData);
 
-        if (
-          notificationsData.length > 0 &&
-          notificationsData[0].id !== latestNotificationId
-        ) {
-          // Check if it's a *new* notification
-          setLatestNotificationId(notificationsData[0].id);
-          playNotificationSound();
+          if (
+            notificationsData.length > 0 &&
+            notificationsData[0].id !== latestNotificationId
+          ) {
+            setLatestNotificationId(notificationsData[0].id);
+            playNotificationSound();
+          }
+        },
+        (error) => {
+          console.error("Error listening for guest notifications: ", error);
+          setTimeout(initializeListener, 5000); // Reconnect after 5 seconds
         }
-      },
-      (error) => {
-        console.error("Error listening for guest notifications: ", error);
-      }
-    );
+      );
+    };
 
-    return () => unsubscribe();
-  }, [playNotificationSound, latestNotificationId]); // Added latestNotificationId
+    const unsubscribe = initializeListener();
+
+    return () => unsubscribe && unsubscribe();
+  }, [playNotificationSound, latestNotificationId]);
 
   const enableSound = () => {
     setIsSoundEnabled(!soundEnabled);
