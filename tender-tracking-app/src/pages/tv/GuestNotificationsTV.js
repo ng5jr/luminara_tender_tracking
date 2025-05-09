@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { db } from "../../firebaseconfig";
-import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, doc } from "firebase/firestore";
 import notificationSound from "../../assets/notification.mp3";
 
 import "./GuestNotificationsTV.css";
@@ -11,9 +11,10 @@ function GuestNotificationsTV() {
     const [notifications, setNotifications] = useState([]);
     const [latestNotificationId, setLatestNotificationId] = useState(null);
     const [uploadedImage, setUploadedImage] = useState(null);
-    const [isImageUploaded, setIsImageUploaded] = useState(false); // New state
-    const [imageDisplayMode, setImageDisplayMode] = useState('contain'); // New state
+    const [isImageUploaded, setIsImageUploaded] = useState(false);
+    const [imageDisplayMode, setImageDisplayMode] = useState('contain');
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [isLoadingImage, setIsLoadingImage] = useState(true);
     const tvLayoutRef = useRef(null);
     const audioRef = useRef(null);
     // const [soundEnabled, setIsSoundEnabled] = useState(false);
@@ -32,6 +33,38 @@ function GuestNotificationsTV() {
     //             .catch((error) => console.warn("Audio playback failed:", error));
     //     }
     // }, [soundEnabled]);
+
+    // Listen for image changes in Firebase
+    useEffect(() => {
+        const displayImageRef = doc(db, "displayImages", "tvDisplay");
+
+        const unsubscribe = onSnapshot(
+            displayImageRef,
+            (docSnapshot) => {
+                if (docSnapshot.exists()) {
+                    const data = docSnapshot.data();
+                    if (data && data.imageData) {
+                        setUploadedImage(data.imageData);
+                        setIsImageUploaded(true);
+                    } else {
+                        setIsImageUploaded(false);
+                        setUploadedImage(null);
+                    }
+                } else {
+                    console.log("No display image document found");
+                    setIsImageUploaded(false);
+                    setUploadedImage(null);
+                }
+                setIsLoadingImage(false);
+            },
+            (error) => {
+                console.error("Error fetching display image:", error);
+                setIsLoadingImage(false);
+            }
+        );
+
+        return () => unsubscribe();
+    }, []);
 
     useEffect(() => {
         const initializeListener = () => {
@@ -73,18 +106,6 @@ function GuestNotificationsTV() {
     //         audioRef.current.muted = false;
     //     }
     // };
-
-    const handleImageUpload = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                setUploadedImage(reader.result);
-                setIsImageUploaded(true); // Hide upload elements
-            };
-            reader.readAsDataURL(file);
-        }
-    };
 
     const toggleImageDisplayMode = () => {
         setImageDisplayMode(prevMode => prevMode === 'contain' ? 'cover' : 'contain');
@@ -150,45 +171,39 @@ function GuestNotificationsTV() {
 
     return (
         <div className="tv-layout" ref={tvLayoutRef}>
-            {/* Left side: Image upload and display */}
+            {/* Left side: Image display from Firebase */}
             <div className={`image-section ${isImageUploaded ? "full-screen" : ""}`}>
-                {!isImageUploaded && (
+                {isLoadingImage ? (
+                    <div className="loading-image">Loading image...</div>
+                ) : (
                     <>
-                        <h2>Upload and Display Image</h2>
-                        <input type="file" accept="image/*" onChange={handleImageUpload} />
+                        {!isImageUploaded && (
+                            <div className="no-image-message">
+                                <h2>Waiting for image from system</h2>
+                                <p>Image will display automatically when available</p>
+                            </div>
+                        )}
+                        {uploadedImage && (
+                            <div className="image-container">
+                                <img
+                                    src={uploadedImage}
+                                    alt="Display"
+                                    className={`image-${imageDisplayMode}`}
+                                    onClick={toggleImageDisplayMode}
+                                />
+                            </div>
+                        )}
                     </>
-                )}
-                {uploadedImage && (
-                    <div className="image-container">
-                        <img
-                            src={uploadedImage}
-                            alt="Uploaded"
-                            className={`image-${imageDisplayMode}`}
-                            onClick={toggleImageDisplayMode}
-                        />
-                    </div>
                 )}
             </div>
 
             {/* Right side: Notifications */}
             <div className="guest-notificationstv">
-                {/* <Link to="/feedback">
-          <div className="feedback-icon-container">
-            <img src={rating} alt="View Tender Map" className="rating-icon" />
-          </div>
-        </Link>
-        <div onClick={enableSound} className="volume">
-          {soundEnabled ? (
-            <img src={volume} alt="volume" className="volume-icon" />
-          ) : (
-            <img src={mute} alt="volume" className="volume-icon" />
-          )}
-        </div> */}
                 <Logo />
                 <h2>TENDER STATUS NOTIFICATIONS</h2>
                 <div onClick={toggleFullscreen} className="screen-toggle">
                     {!isFullscreen ? (
-                        <img src={FullScren} alt="fulscreen" className="screen-icon" />
+                        <img src={FullScren} alt="fullscreen" className="screen-icon" />
                     ) : (
                         <img src={Minimize} alt="minimize" className="screen-icon" />
                     )}
