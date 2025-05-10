@@ -1,88 +1,76 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { db } from "../../firebaseconfig"; // Adjust path if needed
-import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
-import notificationSound from "../../assets/notification.mp3"; // Adjust path if needed
-// import mapIcon from "../../assets/map.png";
-import volume from "../../assets/volume.png"; // Adjust path if needed
-import mute from "../../assets/mute.png"; // Adjust path if needed
-import { Link } from "react-router-dom"; // Import Link
-import "./guestnotifications.css"; // Or your CSS file
-import Logo from "../../components/logo.js"; // Adjust path if needed
-import rating from "../../assets/rating.png"; // Adjust path if needed
+import React, { useState, useEffect, useRef } from "react";
+import { db } from "../../firebaseconfig";
+import { collection, query, orderBy, onSnapshot, limit } from "firebase/firestore";
+import notificationSound from "../../assets/notification.mp3";
+import volume from "../../assets/volume.png";
+import mute from "../../assets/mute.png";
+import { Link } from "react-router-dom";
+import "./guestnotifications.css";
+import Logo from "../../components/logo.js";
+import rating from "../../assets/rating.png";
 
 function GuestNotifications() {
   const [notifications, setNotifications] = useState([]);
   const [latestNotificationId, setLatestNotificationId] = useState(null);
+  const latestIdRef = useRef(null);
   const audioRef = useRef(null);
   const [soundEnabled, setIsSoundEnabled] = useState(false);
+  const soundEnabledRef = useRef(soundEnabled);
 
+  // Keep soundEnabledRef in sync
   useEffect(() => {
-    audioRef.current = new Audio(notificationSound);
+    soundEnabledRef.current = soundEnabled;
     if (audioRef.current) {
-      audioRef.current.muted = true;
-    }
-  }, []); // Removed notificationSound from the dependency array
-
-  const playNotificationSound = useCallback(() => {
-    if (audioRef.current && soundEnabled) {
-      audioRef.current
-        .play()
-        .catch((error) => console.warn("Audio playback failed:", error));
+      audioRef.current.muted = !soundEnabled;
     }
   }, [soundEnabled]);
 
+  // Track latestNotificationId in a ref to avoid re-creating listener
   useEffect(() => {
-    const initializeListener = () => {
-      const notificationsColRef = collection(db, "guestNotifications");
-      const q = query(notificationsColRef, orderBy("timestamp", "desc"));
+    latestIdRef.current = latestNotificationId;
+  }, [latestNotificationId]);
 
-      return onSnapshot(
-        q,
-        (querySnapshot) => {
-          const notificationsData = querySnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          setNotifications(notificationsData);
+  // Set up Firestore listener ONCE
+  useEffect(() => {
+    const notificationsColRef = collection(db, "guestNotifications");
+    const q = query(notificationsColRef, orderBy("timestamp", "desc"), limit(10));
 
-          if (
-            notificationsData.length > 0 &&
-            notificationsData[0].id !== latestNotificationId
-          ) {
-            setLatestNotificationId(notificationsData[0].id);
-            playNotificationSound();
+    const unsubscribe = onSnapshot(
+      q,
+      (querySnapshot) => {
+        const notificationsData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setNotifications(notificationsData);
+
+        // Play sound only for new notification
+        if (
+          notificationsData.length > 0 &&
+          notificationsData[0].id !== latestIdRef.current
+        ) {
+          setLatestNotificationId(notificationsData[0].id);
+          if (audioRef.current && soundEnabledRef.current) {
+            audioRef.current.currentTime = 0;
+            audioRef.current.play().catch(() => { });
           }
-        },
-        (error) => {
-          console.error("Error listening for guest notifications: ", error);
-          setTimeout(initializeListener, 5000); // Reconnect after 5 seconds
         }
-      );
-    };
+      },
+      (error) => {
+        console.error("Error listening for guest notifications: ", error);
+      }
+    );
 
-    const unsubscribe = initializeListener();
+    return () => unsubscribe();
+  }, []); // Only run once
 
-    return () => unsubscribe && unsubscribe();
-  }, [playNotificationSound, latestNotificationId]);
-
+  // Toggle sound and mute/unmute audio element
   const enableSound = () => {
-    setIsSoundEnabled(!soundEnabled);
-    if (audioRef.current) {
-      audioRef.current.muted = false;
-    }
-  };
-
-  const getLast10Notifications = () => {
-    return notifications.slice(0, 10);
+    setIsSoundEnabled((prev) => !prev);
   };
 
   return (
     <div className="guest-notifications">
-      {/* <Link to="/map">
-         <div className="map-icon-container">
-         <img src={mapIcon} alt="View Tender Map" className="map-icon" />
-         </div>
-         </Link>  */}
       <Link to="/feedback">
         <div className="feedback-icon-container">
           <img src={rating} alt="View Tender Map" className="rating-icon" />
@@ -101,10 +89,10 @@ function GuestNotifications() {
         ref={audioRef}
         src={notificationSound}
         style={{ display: "none" }}
-      />{" "}
-      {/* Add audio element, hide it */}
+        muted={!soundEnabled}
+      />
       <ul className="notification-list">
-        {getLast10Notifications().map((notification) => (
+        {notifications.map((notification) => (
           <li
             key={notification.id}
             className={`notification-item ${notification.direction === "SHORESIDE"
@@ -115,7 +103,7 @@ function GuestNotifications() {
               } ${notification.id === latestNotificationId
                 ? "blinking-notification"
                 : ""
-              }`} // Add blinking class conditionally
+              }`}
           >
             <p className="notification-message">{notification.message}</p>
             <p className="notification-time">

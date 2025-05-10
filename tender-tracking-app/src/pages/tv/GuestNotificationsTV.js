@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { db } from "../../firebaseconfig";
-import { collection, query, orderBy, onSnapshot, doc } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, doc, limit } from "firebase/firestore";
 import notificationSound from "../../assets/notification.mp3";
 
 import "./GuestNotificationsTV.css";
@@ -10,6 +10,7 @@ import Minimize from "../../assets/minimize.png"; // Adjust path if needed
 function GuestNotificationsTV() {
     const [notifications, setNotifications] = useState([]);
     const [latestNotificationId, setLatestNotificationId] = useState(null);
+    const latestIdRef = useRef(null);
     const [uploadedImage, setUploadedImage] = useState(null);
     const [isImageUploaded, setIsImageUploaded] = useState(false);
     const [imageDisplayMode, setImageDisplayMode] = useState('contain');
@@ -67,38 +68,39 @@ function GuestNotificationsTV() {
     }, []);
 
     useEffect(() => {
+        latestIdRef.current = latestNotificationId;
+    }, [latestNotificationId]);
+
+    useEffect(() => {
         const initializeListener = () => {
             const notificationsColRef = collection(db, "guestNotifications");
-            const q = query(notificationsColRef, orderBy("timestamp", "desc"));
-
-            return onSnapshot(
-                q,
-                (querySnapshot) => {
-                    const notificationsData = querySnapshot.docs.map((doc) => ({
-                        id: doc.id,
-                        ...doc.data(),
-                    }));
-                    setNotifications(notificationsData);
-
-                    if (
-                        notificationsData.length > 0 &&
-                        notificationsData[0].id !== latestNotificationId
-                    ) {
-                        setLatestNotificationId(notificationsData[0].id);
-                        // playNotificationSound();
-                    }
-                },
-                (error) => {
-                    console.error("Error listening for guest notifications: ", error);
-                    setTimeout(initializeListener, 5000); // Reconnect after 5 seconds
-                }
+            const q = query(
+                notificationsColRef,
+                orderBy("timestamp", "desc"),
+                limit(10)
             );
+
+            return onSnapshot(q, (querySnapshot) => {
+                const notificationsData = querySnapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }));
+                setNotifications(notificationsData);
+
+                if (notificationsData.length > 0 &&
+                    notificationsData[0].id !== latestIdRef.current) {
+
+                    setLatestNotificationId(notificationsData[0].id);
+                    // playNotificationSound();
+                }
+            }, (error) => {
+                console.error("Error listening for notifications:", error);
+            });
         };
 
         const unsubscribe = initializeListener();
-
         return () => unsubscribe && unsubscribe();
-    }, [latestNotificationId]);
+    }, []); // Empty dependency array
 
     // const enableSound = () => {
     //     setIsSoundEnabled(!soundEnabled);
@@ -165,9 +167,6 @@ function GuestNotificationsTV() {
         };
     }, []);
 
-    const getLast10Notifications = () => {
-        return notifications.slice(0, 10);
-    };
 
     return (
         <div className="tv-layout" ref={tvLayoutRef}>
@@ -215,7 +214,7 @@ function GuestNotificationsTV() {
                     style={{ display: "none" }}
                 />
                 <ul className="notification-list">
-                    {getLast10Notifications().map((notification) => (
+                    {notifications.map((notification) => (
                         <li
                             key={notification.id}
                             className={`notification-item ${notification.direction === "SHORESIDE"
