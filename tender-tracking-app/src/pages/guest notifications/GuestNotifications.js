@@ -120,6 +120,20 @@ function GuestNotifications() {
             });
           }
 
+          let displayMessage = "";
+
+          if (notification.direction === "SHORESIDE" || notification.direction === "SHIPSIDE") {
+            if (notification.action === "ARRIVED") {
+              displayMessage = notification.message;
+            } else if (notification.action === "DEPARTED") {
+              displayMessage = `${notification.message} Estimated time of arrival: ${arrivalTime}.`;
+            } else {
+              displayMessage = `${notification.message} Estimated time of arrival: ${arrivalTime}.`;
+            }
+          } else {
+            displayMessage = notification.message;
+          }
+
           return (
             <li
               key={notification.id}
@@ -134,10 +148,7 @@ function GuestNotifications() {
                 }`}
             >
               <p className="notification-message">
-                {(notification.direction === "SHORESIDE" || notification.direction === "SHIPSIDE")
-                  ? `${notification.message} Estimated time of arrival: ${arrivalTime}.`
-                  : `${notification.message}`}
-
+                {displayMessage}
               </p>
               <p className="notification-time">
                 {notification.timestamp?.toDate()?.toLocaleString(undefined, {

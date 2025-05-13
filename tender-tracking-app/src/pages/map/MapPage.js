@@ -55,7 +55,7 @@ const MyMap = () => {
 
   return (
     <div className="guest-notifications">
-      <Logo page="map" />
+      <Logo page="no-sound" />
       {/* 
       <Link to="/">
         <div className="map-icon-containers">

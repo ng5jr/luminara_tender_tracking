@@ -164,11 +164,11 @@ const Logo = ({ page, enableSound, soundEnabled }) => {
           <span>Live Tracker</span>
           {/* <FaMapLocationDot /> */}
         </Link>
-        <Link className="header-link" to="/map">
+        <Link className="header-link" to="/feedback">
           <span>Feedback</span>
           {/* <SlLike /> */}
         </Link>
-        {page !== "map" && (<div onClick={enableSound} className="volume">
+        {page !== "no-sound" && (<div onClick={enableSound} className="volume">
           {!soundEnabled ? (
             <FaVolumeMute />
           ) : (

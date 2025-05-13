@@ -74,13 +74,8 @@ function Rating() {
 
   return (
     <div className="feedback-website">
-      <Logo /> {/* Logo component */}
-      <Link to="/">
-        <div className="map-icon-containers">
-          <img src={back} alt="View Tender Map" className="map-icon" />
-        </div>
-      </Link>
-      <h2>GUEST FEEDBACK</h2>
+      <Logo page="no-sound" /> {/* Logo component */}
+      <h1>GUEST FEEDBACK</h1>
       <div className="rating-section">
         <h3>Rate our notification service:</h3>
         <div className="star-rating">
