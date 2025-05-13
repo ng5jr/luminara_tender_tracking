@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { db } from "../../firebaseconfig";
-import { collection, query, orderBy, onSnapshot, doc, limit } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, doc, limit, where } from "firebase/firestore";
 import notificationSound from "../../assets/notification.mp3";
 
 import "./GuestNotificationsTV.css";
@@ -18,6 +18,8 @@ function GuestNotificationsTV() {
     const [isLoadingImage, setIsLoadingImage] = useState(true);
     const tvLayoutRef = useRef(null);
     const audioRef = useRef(null);
+    const [portName, setPortName] = useState("");
+
     // const [soundEnabled, setIsSoundEnabled] = useState(false);
 
     // useEffect(() => {
@@ -72,35 +74,63 @@ function GuestNotificationsTV() {
     }, [latestNotificationId]);
 
     useEffect(() => {
-        const initializeListener = () => {
-            const notificationsColRef = collection(db, "guestNotifications");
-            const q = query(
-                notificationsColRef,
-                orderBy("timestamp", "desc"),
-                limit(10)
-            );
+        let unsubscribePortDays = null;
+        let unsubscribeNotifications = null;
 
-            return onSnapshot(q, (querySnapshot) => {
-                const notificationsData = querySnapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
-                setNotifications(notificationsData);
+        unsubscribePortDays = onSnapshot(
+            collection(db, "portDays"),
+            (portDaysSnapshot) => {
+                const activePortDayDoc = portDaysSnapshot.docs.find(doc => doc.data().isActive);
 
-                if (notificationsData.length > 0 &&
-                    notificationsData[0].id !== latestIdRef.current) {
+                if (activePortDayDoc) {
+                    setPortName(activePortDayDoc.data().name || "");
 
-                    setLatestNotificationId(notificationsData[0].id);
-                    // playNotificationSound();
+                    // Unsubscribe from previous notifications listener if any
+                    if (unsubscribeNotifications) unsubscribeNotifications();
+
+                    const notificationsQuery = query(
+                        collection(db, "guestNotifications"),
+                        where("portDayId", "==", activePortDayDoc.id),
+                        orderBy("timestamp", "desc"),
+                        limit(10)
+                    );
+
+                    unsubscribeNotifications = onSnapshot(
+                        notificationsQuery,
+                        (querySnapshot) => {
+                            const notificationsData = querySnapshot.docs.map((doc) => ({
+                                id: doc.id,
+                                ...doc.data(),
+                            }));
+                            setNotifications(notificationsData);
+
+                            if (
+                                notificationsData.length > 0 &&
+                                notificationsData[0].id !== latestIdRef.current
+                            ) {
+                                setLatestNotificationId(notificationsData[0].id);
+                            }
+                        },
+                        (error) => {
+                            console.error("Error listening for guest notifications: ", error);
+                        }
+                    );
+                } else {
+                    setNotifications([]);
+                    setPortName("");
+                    if (unsubscribeNotifications) unsubscribeNotifications();
                 }
-            }, (error) => {
-                console.error("Error listening for notifications:", error);
-            });
-        };
+            },
+            (error) => {
+                console.error("Error listening for port days: ", error);
+            }
+        );
 
-        const unsubscribe = initializeListener();
-        return () => unsubscribe && unsubscribe();
-    }, []); // Empty dependency array
+        return () => {
+            if (unsubscribePortDays) unsubscribePortDays();
+            if (unsubscribeNotifications) unsubscribeNotifications();
+        };
+    }, []);
 
     // const enableSound = () => {
     //     setIsSoundEnabled(!soundEnabled);
@@ -199,7 +229,7 @@ function GuestNotificationsTV() {
             {/* Right side: Notifications */}
             <div className="guest-notificationstv">
                 <Logo />
-                <h2>TENDER STATUS NOTIFICATIONS</h2>
+                <h2>{portName ? portName : "Waiting for Port Information"}</h2>
                 <div onClick={toggleFullscreen} className="screen-toggle">
                     {!isFullscreen ? (
                         <img src={FullScren} alt="fullscreen" className="screen-icon" />
