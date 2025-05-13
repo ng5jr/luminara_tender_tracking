@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { db } from "../../firebaseconfig";
-import { collection, query, orderBy, onSnapshot, limit } from "firebase/firestore";
+import { collection, query, orderBy, where, onSnapshot, getDocs, limit } from "firebase/firestore";
 import notificationSound from "../../assets/notification.mp3";
 import volume from "../../assets/volume.png";
 import mute from "../../assets/mute.png";
@@ -12,12 +12,12 @@ import rating from "../../assets/rating.png";
 function GuestNotifications() {
   const [notifications, setNotifications] = useState([]);
   const [latestNotificationId, setLatestNotificationId] = useState(null);
+  const [portName, setPortName] = useState(""); // <-- Add this line
   const latestIdRef = useRef(null);
   const audioRef = useRef(null);
   const [soundEnabled, setIsSoundEnabled] = useState(false);
   const soundEnabledRef = useRef(soundEnabled);
 
-  // Keep soundEnabledRef in sync
   useEffect(() => {
     soundEnabledRef.current = soundEnabled;
     if (audioRef.current) {
@@ -25,46 +25,73 @@ function GuestNotifications() {
     }
   }, [soundEnabled]);
 
-  // Track latestNotificationId in a ref to avoid re-creating listener
   useEffect(() => {
     latestIdRef.current = latestNotificationId;
   }, [latestNotificationId]);
 
-  // Set up Firestore listener ONCE
   useEffect(() => {
-    const notificationsColRef = collection(db, "guestNotifications");
-    const q = query(notificationsColRef, orderBy("timestamp", "desc"), limit(10));
+    let unsubscribePortDays = null;
+    let unsubscribeNotifications = null;
 
-    const unsubscribe = onSnapshot(
-      q,
-      (querySnapshot) => {
-        const notificationsData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setNotifications(notificationsData);
+    unsubscribePortDays = onSnapshot(
+      collection(db, "portDays"),
+      (portDaysSnapshot) => {
+        const activePortDayDoc = portDaysSnapshot.docs.find(doc => doc.data().isActive);
 
-        // Play sound only for new notification
-        if (
-          notificationsData.length > 0 &&
-          notificationsData[0].id !== latestIdRef.current
-        ) {
-          setLatestNotificationId(notificationsData[0].id);
-          if (audioRef.current && soundEnabledRef.current) {
-            audioRef.current.currentTime = 0;
-            audioRef.current.play().catch(() => { });
-          }
+        if (activePortDayDoc) {
+          setPortName(activePortDayDoc.data().name || "");
+
+          // Unsubscribe from previous notifications listener if any
+          if (unsubscribeNotifications) unsubscribeNotifications();
+
+          const notificationsQuery = query(
+            collection(db, "guestNotifications"),
+            where("portDayId", "==", activePortDayDoc.id),
+            orderBy("timestamp", "desc"),
+            limit(10)
+          );
+
+          unsubscribeNotifications = onSnapshot(
+            notificationsQuery,
+            (querySnapshot) => {
+              const notificationsData = querySnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              }));
+              setNotifications(notificationsData);
+
+              if (
+                notificationsData.length > 0 &&
+                notificationsData[0].id !== latestIdRef.current
+              ) {
+                setLatestNotificationId(notificationsData[0].id);
+                if (audioRef.current && soundEnabledRef.current) {
+                  audioRef.current.currentTime = 0;
+                  audioRef.current.play().catch(() => { });
+                }
+              }
+            },
+            (error) => {
+              console.error("Error listening for guest notifications: ", error);
+            }
+          );
+        } else {
+          setNotifications([]);
+          setPortName("");
+          if (unsubscribeNotifications) unsubscribeNotifications();
         }
       },
       (error) => {
-        console.error("Error listening for guest notifications: ", error);
+        console.error("Error listening for port days: ", error);
       }
     );
 
-    return () => unsubscribe();
-  }, []); // Only run once
+    return () => {
+      if (unsubscribePortDays) unsubscribePortDays();
+      if (unsubscribeNotifications) unsubscribeNotifications();
+    };
+  }, []);
 
-  // Toggle sound and mute/unmute audio element
   const enableSound = () => {
     setIsSoundEnabled((prev) => !prev);
   };
@@ -85,6 +112,7 @@ function GuestNotifications() {
       </div>
       <Logo />
       <h2>TENDER STATUS NOTIFICATIONS</h2>
+      <h2>{portName ? portName : "Waiting for Port Information"}</h2>
       <audio
         ref={audioRef}
         src={notificationSound}

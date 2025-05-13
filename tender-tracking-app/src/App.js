@@ -12,7 +12,7 @@ function App() {
       <Routes>
         <Route path="/" element={<GuestNotifications />} />
         <Route path="/tv" element={<GuestNotificationsTV />} />
-        {/* <Route path="/map" element={<MapPage />} />  */}
+        <Route path="/map" element={<MapPage />} />
         <Route path="/feedback" element={<Rating />} />
         <Route
           path="*"
