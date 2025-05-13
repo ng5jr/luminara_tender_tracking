@@ -1,36 +1,55 @@
 /* GuestNotifications.css - Mobile Only */
 body {
   box-sizing: border-box;
-  background-color: black;
+  background-color: #1c1c1c;
 }
 
 .guest-notifications {
-  font-family: 'Big Caslon', 'Times New Roman', serif;
   margin: 10px auto;
   /* Reduced margin for mobile */
-  padding: 45px 35px;
+  padding: 35px 35px;
   /* Reduced padding for mobile */
-  border: 1px solid #e6e6e6;
+  border: 1px solid white;
   border-radius: 8px;
   /* Slightly smaller radius for mobile */
-  background-color: #222;
+  background-color: #1c1c1c;
   color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   /* Less pronounced shadow */
   max-width: 800px;
   /* Take up full width on mobile */
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 20px;
+
+}
+
+.guest-notifications h1 {
+  font-family: 'Big Caslon', 'Times New Roman', serif;
+  text-transform: uppercase;
+  text-align: center;
+  font-weight: 400;
+  line-height: 1.1em;
+  letter-spacing: 0.05em;
+  color: white;
+  margin: 0;
+  font-size: 30px;
 }
 
 .guest-notifications h2 {
+  font-family: 'Proxima Nova', 'Helvetica Neue', sans-serif;
+  text-transform: uppercase;
   text-align: center;
-  margin-bottom: 20px;
-  /* Reduced margin */
-  color: #fff;
-  font-size: 2em;
-  /* Smaller heading for mobile */
-  font-weight: 500;
+  font-weight: 200;
+  line-height: 1.2em;
+  letter-spacing: 0.05em;
+  color: white;
+  margin: 0;
+  font-size: 20px;
 }
+
 
 .notification-list {
   border-radius: 10px;
@@ -53,35 +72,43 @@ body {
 }
 
 .notification-message {
+  font-family: 'Proxima Nova', 'Helvetica Neue', sans-serif;
+
   font-weight: 500;
-  font-size: 1.2em;
+  font-size: 16px;
   /* Smaller font size for mobile */
-  color: #fff;
+  line-height: 1.6em;
+
   margin-bottom: 3px;
   /* Reduced margin */
 }
 
 .notification-time {
-  font-size: 1em;
+  font-size: 14px;
   /* Smaller font size for mobile */
-  color: #aaa;
+  font-family: 'Proxima Nova', 'Helvetica Neue', sans-serif;
+
+  opacity: 0.8;
 }
 
 /* New Styles for Shoreside and Shipside */
 
 .shoreside-notification {
-  background-color: rgba(220, 128, 53, 0.2);
-
+  background-color: white;
+  color: #1c1c1c;
   text-align: center;
 }
 
 .shipside-notification {
-  background-color: rgba(0, 123, 255, 0.2);
+  background-color: #c7ddf3;
   text-align: center;
+
+  color: #1c1c1c;
+
 }
 
 .custom-notification {
-  background-color: rgba(7, 255, 52, 0.116);
+  background-color: black;
   text-align: center;
 }
 
@@ -114,66 +141,7 @@ body {
   }
 }
 
-.feedback-icon-container {
-  padding: 10px;
-  border-radius: 100%;
-  background-color: white;
-  position: absolute;
-  right: 35px;
-  top: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  /* Ensure cursor is a pointer */
-  animation: pulse-animation 2s infinite;
-  /* Apply the animation */
-  transition: background-color 0.2s;
-  /* Add a transition for background-color */
-  width: 25px;
-  height: 25px;
-  background-image: linear-gradient(#f7f8fa, #e7e9ec);
-  box-shadow: rgba(255, 255, 255, .6) 0 1px 0 inset;
-}
 
-.feedback-icon-container:hover {
-  background-color: #f0f0f0;
-  /* Slightly lighter background on hover */
-}
-
-.feedback-icon-container:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-  animation: none;
-  /* Disable animation when disabled */
-}
-
-
-.volume-icon {
-  width: 20px;
-  height: 20px;
-}
-
-.rating-icon {
-  width: 25px;
-  height: 25px;
-}
-
-.volume {
-  width: 25px;
-  height: 25px;
-  padding: 10px;
-  border-radius: 100%;
-  background-image: linear-gradient(#f7f8fa, #e7e9ec);
-  box-shadow: rgba(255, 255, 255, .6) 0 1px 0 inset;
-  position: absolute;
-  left: 35px;
-  top: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
 
 @media screen and (max-width: 600px) {
   .guest-notifications {
@@ -183,9 +151,19 @@ body {
     /* Further reduced margin for mobile */
   }
 
+  .guest-notifications h1 {
+    line-height: 1.1em;
+    letter-spacing: 0.05em;
+    font-size: 25px;
+  }
+
   .guest-notifications h2 {
-    font-size: 1.5em;
-    /* Smaller heading for mobile */
+
+    font-weight: 200;
+    line-height: 1.2em;
+    letter-spacing: 0.05em;
+
+    font-size: 15px;
   }
 
   .notification-item {
@@ -194,12 +172,12 @@ body {
   }
 
   .notification-message {
-    font-size: 1em;
+    font-size: 12px;
     /* Further reduced font size for mobile */
   }
 
   .notification-time {
-    font-size: 0.9em;
+    font-size: 10px;
     /* Further reduced font size for mobile */
   }
 
@@ -211,12 +189,5 @@ body {
     /* Adjusted position for mobile */
   }
 
-  .volume {
-    width: 20px;
-    height: 20px;
-    left: 15px;
-    top: 20px;
-    /* Adjusted position for mobile */
-  }
 
 }

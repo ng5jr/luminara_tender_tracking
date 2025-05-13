@@ -55,21 +55,21 @@ const MyMap = () => {
 
   return (
     <div className="guest-notifications">
-      <Logo />
-
+      <Logo page="map" />
+      {/* 
       <Link to="/">
         <div className="map-icon-containers">
           <img src={back} alt="View Tender Map" className="map-icon" />
         </div>
-      </Link>
+      </Link> */}
 
-      <h2>TENDER TRACKING MAP</h2>
+      <h1>TENDER TRACKING MAP</h1>
 
       <MapContainer
         center={mapCenter}
-        zoom={14}
+        zoom={13}
         scrollWheelZoom={true}
-        style={{ height: '500px', width: '100%' }}
+        style={{ height: '400px', width: '100%' }}
       >
         <ChangeMapCenter center={mapCenter} />
         <TileLayer

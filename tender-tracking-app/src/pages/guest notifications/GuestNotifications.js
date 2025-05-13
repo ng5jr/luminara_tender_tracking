@@ -2,12 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { db } from "../../firebaseconfig";
 import { collection, query, orderBy, where, onSnapshot, getDocs, limit } from "firebase/firestore";
 import notificationSound from "../../assets/notification.mp3";
-import volume from "../../assets/volume.png";
-import mute from "../../assets/mute.png";
-import { Link } from "react-router-dom";
+
 import "./guestnotifications.css";
 import Logo from "../../components/logo.js";
-import rating from "../../assets/rating.png";
+
 
 function GuestNotifications() {
   const [notifications, setNotifications] = useState([]);
@@ -17,6 +15,7 @@ function GuestNotifications() {
   const audioRef = useRef(null);
   const [soundEnabled, setIsSoundEnabled] = useState(false);
   const soundEnabledRef = useRef(soundEnabled);
+  const [avgTime, setAvgTime] = useState(0);
 
   useEffect(() => {
     soundEnabledRef.current = soundEnabled;
@@ -40,6 +39,7 @@ function GuestNotifications() {
 
         if (activePortDayDoc) {
           setPortName(activePortDayDoc.data().name || "");
+          setAvgTime(activePortDayDoc.data().avgTime || 0);
 
           // Unsubscribe from previous notifications listener if any
           if (unsubscribeNotifications) unsubscribeNotifications();
@@ -98,20 +98,8 @@ function GuestNotifications() {
 
   return (
     <div className="guest-notifications">
-      <Link to="/feedback">
-        <div className="feedback-icon-container">
-          <img src={rating} alt="View Tender Map" className="rating-icon" />
-        </div>
-      </Link>
-      <div onClick={enableSound} className="volume">
-        {soundEnabled ? (
-          <img src={volume} alt="volume" className="volume-icon" />
-        ) : (
-          <img src={mute} alt="volume" className="volume-icon" />
-        )}
-      </div>
-      <Logo />
-      <h2>TENDER STATUS NOTIFICATIONS</h2>
+      <Logo enableSound={enableSound} soundEnabled={soundEnabled} />
+      <h1>TENDER STATUS NOTIFICATIONS</h1>
       <h2>{portName ? portName : "Waiting for Port Information"}</h2>
       <audio
         ref={audioRef}
@@ -120,29 +108,47 @@ function GuestNotifications() {
         muted={!soundEnabled}
       />
       <ul className="notification-list">
-        {notifications.map((notification) => (
-          <li
-            key={notification.id}
-            className={`notification-item ${notification.direction === "SHORESIDE"
-              ? "shoreside-notification"
-              : notification.direction === "SHIPSIDE"
-                ? "shipside-notification"
-                : "custom-notification"
-              } ${notification.id === latestNotificationId
-                ? "blinking-notification"
-                : ""
-              }`}
-          >
-            <p className="notification-message">{notification.message}</p>
-            <p className="notification-time">
-              {notification.timestamp?.toDate()?.toLocaleString(undefined, {
-                hour: "numeric",
-                minute: "numeric",
-                hour12: true,
-              })}
-            </p>
-          </li>
-        ))}
+        {notifications.map((notification) => {
+          // Calculate arrival time
+          let arrivalTime = "";
+          if (notification.timestamp && avgTime) {
+            const arrivalDate = new Date(notification.timestamp.toDate().getTime() + avgTime * 60000);
+            arrivalTime = arrivalDate.toLocaleString(undefined, {
+              hour: "numeric",
+              minute: "numeric",
+              hour12: true,
+            });
+          }
+
+          return (
+            <li
+              key={notification.id}
+              className={`notification-item ${notification.direction === "SHORESIDE"
+                ? "shoreside-notification"
+                : notification.direction === "SHIPSIDE"
+                  ? "shipside-notification"
+                  : "custom-notification"
+                } ${notification.id === latestNotificationId
+                  ? "blinking-notification"
+                  : ""
+                }`}
+            >
+              <p className="notification-message">
+                {(notification.direction === "SHORESIDE" || notification.direction === "SHIPSIDE")
+                  ? `${notification.message} Estimated time of arrival: ${arrivalTime}.`
+                  : `${notification.message}`}
+
+              </p>
+              <p className="notification-time">
+                {notification.timestamp?.toDate()?.toLocaleString(undefined, {
+                  hour: "numeric",
+                  minute: "numeric",
+                  hour12: true,
+                })}
+              </p>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
