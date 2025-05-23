@@ -12,6 +12,8 @@
   flex-direction: column;
   justify-content: flex-start;
   gap: 20px;
+  height: calc(100vh - 20px);
+  box-sizing: border-box;
 }
 
 
@@ -176,7 +178,7 @@
   .feedback-website {
     padding: 20px 15px;
     /* Further reduced padding for mobile */
-    margin: 5px auto;
+    margin: 10px;
     /* Further reduced margin for mobile */
   }
 
@@ -234,4 +236,15 @@
     /* Larger headings for desktop */
   }
 
+}
+
+
+.sections {
+  display: flex;
+  justify-content: flex-start;
+
+  flex-direction: column;
+
+  overflow: scroll;
+  height: 100%;
 }
