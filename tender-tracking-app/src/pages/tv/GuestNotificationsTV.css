@@ -1,6 +1,14 @@
+/* GuestNotifications.css - Mobile Only */
+body {
+    box-sizing: border-box;
+    background-color: #1c1c1c;
+    margin: 0;
+
+}
+
 .guest-notificationstv {
     font-family: 'Big Caslon', 'Times New Roman', serif;
-    margin: none;
+    margin: 0;
     /* Reduced margin for mobile */
     padding: 45px 35px;
     /* Reduced padding for mobile */
@@ -16,7 +24,7 @@
     position: relative;
     flex: 1;
     padding: 20px;
-    overflow-y: hidden;
+    overflow: hidden;
     max-width: none;
     border-bottom: none;
     border-top: none;
