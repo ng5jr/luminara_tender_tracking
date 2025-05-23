@@ -20,7 +20,7 @@ body {
   flex-direction: column;
   justify-content: flex-start;
   gap: 20px;
-  height: 95vh;
+  height: calc(100vh - 20px);
 
 }
 
@@ -160,9 +160,9 @@ body {
   .guest-notifications {
     padding: 20px 15px;
     /* Further reduced padding for mobile */
-    margin: 10px auto;
+    margin: 10px;
     /* Further reduced margin for mobile */
-
+    height: calc(100vh - 20px);
   }
 
   .guest-notifications h1 {
