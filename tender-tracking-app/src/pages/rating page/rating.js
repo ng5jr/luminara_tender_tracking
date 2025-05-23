@@ -83,46 +83,48 @@ function Rating() {
 
   return (
     <div className="feedback-website">
-      <Logo page="no-sound" /> {/* Logo component */}
+      <Logo page="no-sound" />
       <h1>GUEST FEEDBACK</h1>
-      <div className="rating-section">
-        <h3>Rate our notification service:</h3>
-        <div className="star-rating">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <span
-              key={star}
-              className={`star ${star <= websiteRating ? "filled" : ""}`}
-              onClick={() => handleWebsiteRatingClick(star)}
-            >
-              ★
-            </span>
-          ))}
+      <div className="sections">
+        <div className="rating-section">
+          <h3>Rate our notification service:</h3>
+          <div className="star-rating">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <span
+                key={star}
+                className={`star ${star <= websiteRating ? "filled" : ""}`}
+                onClick={() => handleWebsiteRatingClick(star)}
+              >
+                ★
+              </span>
+            ))}
+          </div>
+          {/* {websiteRating > 0 && <p>You rated the website {websiteRating} stars.</p>} */}
         </div>
-        {/* {websiteRating > 0 && <p>You rated the website {websiteRating} stars.</p>} */}
-      </div>
-      <div className="rating-section">
-        <h3>Rate your tender ride:</h3>
-        <div className="star-rating">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <span
-              key={star}
-              className={`star ${star <= tenderRating ? "filled" : ""}`}
-              onClick={() => handleTenderRatingClick(star)}
-            >
-              ★
-            </span>
-          ))}
+        <div className="rating-section">
+          <h3>Rate your tender ride:</h3>
+          <div className="star-rating">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <span
+                key={star}
+                className={`star ${star <= tenderRating ? "filled" : ""}`}
+                onClick={() => handleTenderRatingClick(star)}
+              >
+                ★
+              </span>
+            ))}
+          </div>
+          {/* {tenderRating > 0 && <p>You rated the tender service {tenderRating} stars.</p>} */}
         </div>
-        {/* {tenderRating > 0 && <p>You rated the tender service {tenderRating} stars.</p>} */}
-      </div>
-      <div className="comment-section">
-        <h3>Comments:</h3>
-        <textarea
-          value={comments}
-          onChange={handleCommentsChange}
-          placeholder="Would you like to leave us a comment?"
-          rows="4"
-        />
+        <div className="comment-section">
+          <h3>Comments:</h3>
+          <textarea
+            value={comments}
+            onChange={handleCommentsChange}
+            placeholder="Would you like to leave us a comment?"
+            rows="4"
+          />
+        </div>
       </div>
       <button
         onClick={handleSubmitFeedback}

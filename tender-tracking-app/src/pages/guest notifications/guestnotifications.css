@@ -8,26 +8,23 @@ body {
 }
 
 .guest-notifications {
+  box-sizing: border-box;
   margin: 10px auto;
-  /* Reduced margin for mobile */
   padding: 35px 35px;
-  /* Reduced padding for mobile */
   border: 1px solid white;
   border-radius: 8px;
-  /* Slightly smaller radius for mobile */
   background-color: #1c1c1c;
   color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  /* Less pronounced shadow */
   max-width: 800px;
-  /* Take up full width on mobile */
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   gap: 20px;
-  height: 100vh;
-  max-height: 100vh;
+  height: calc(100vh - 20px);
+  /* Subtract top+bottom margin */
+  max-height: calc(100vh - 20px);
 }
 
 .guest-notifications h1 {
@@ -168,6 +165,9 @@ body {
     /* Further reduced padding for mobile */
     margin: 5px auto;
     /* Further reduced margin for mobile */
+    height: calc(100vh - 10px);
+    /* Subtract top+bottom margin */
+    max-height: calc(100vh - 10px);
   }
 
   .guest-notifications h1 {

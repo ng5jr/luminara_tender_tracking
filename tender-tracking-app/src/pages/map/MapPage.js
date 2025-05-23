@@ -69,7 +69,7 @@ const MyMap = () => {
         center={mapCenter}
         zoom={13}
         scrollWheelZoom={true}
-        style={{ height: '400px', width: '100%' }}
+        style={{ height: '100%', width: '100%' }}
       >
         <ChangeMapCenter center={mapCenter} />
         <TileLayer
