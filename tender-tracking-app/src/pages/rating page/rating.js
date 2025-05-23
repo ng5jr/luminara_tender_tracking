@@ -72,6 +72,15 @@ function Rating() {
     }
   }, [redirectTimer, navigate, submissionStatus]); // Dependencies: redirectTimer, navigate, submissionStatus
 
+  useEffect(() => {
+    // Prevent body from scrolling
+    document.body.style.overflow = "hidden";
+    return () => {
+      // Restore body scroll when leaving the page
+      document.body.style.overflow = "";
+    };
+  }, []);
+
   return (
     <div className="feedback-website">
       <Logo page="no-sound" /> {/* Logo component */}

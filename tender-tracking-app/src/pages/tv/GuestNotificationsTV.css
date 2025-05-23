@@ -20,7 +20,37 @@
     max-width: none;
     border-bottom: none;
     border-top: none;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 20px;
 }
+
+.guest-notificationstv h1 {
+    font-family: 'Big Caslon', 'Times New Roman', serif;
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: 400;
+    line-height: 1.1em;
+    letter-spacing: 0.05em;
+    color: white;
+    margin: 0;
+    font-size: 30px;
+}
+
+.guest-notificationstv h2 {
+    font-family: 'Proxima Nova', 'Helvetica Neue', sans-serif;
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: 200;
+    line-height: 1.2em;
+    letter-spacing: 0.05em;
+    color: white;
+    margin: 0;
+    font-size: 20px;
+}
+
 
 .screen-icon {
     width: 20px;
@@ -80,6 +110,7 @@
     height: 100vh;
     background-color: black;
     color: white;
+    overflow: hidden;
 }
 
 .image-section {

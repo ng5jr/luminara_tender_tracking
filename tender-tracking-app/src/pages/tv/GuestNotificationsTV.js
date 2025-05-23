@@ -228,7 +228,8 @@ function GuestNotificationsTV() {
 
             {/* Right side: Notifications */}
             <div className="guest-notificationstv">
-                <Logo />
+                <Logo tv={'tv'} />
+                <h1>TENDER STATUS NOTIFICATIONS</h1>
                 <h2>{portName ? portName : "Waiting for Port Information"}</h2>
                 <div onClick={toggleFullscreen} className="screen-toggle">
                     {!isFullscreen ? (

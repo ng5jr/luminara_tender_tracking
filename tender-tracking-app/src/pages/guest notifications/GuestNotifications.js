@@ -16,6 +16,7 @@ function GuestNotifications() {
   const [soundEnabled, setIsSoundEnabled] = useState(false);
   const soundEnabledRef = useRef(soundEnabled);
   const [avgTime, setAvgTime] = useState(0);
+  const listRef = useRef(null); // Add this ref
 
   useEffect(() => {
     soundEnabledRef.current = soundEnabled;
@@ -96,6 +97,13 @@ function GuestNotifications() {
     setIsSoundEnabled((prev) => !prev);
   };
 
+  // Scroll to top when notifications change
+  useEffect(() => {
+    if (listRef.current) {
+      listRef.current.scrollTop = 0;
+    }
+  }, [notifications]);
+
   return (
     <div className="guest-notifications">
       <Logo enableSound={enableSound} soundEnabled={soundEnabled} />
@@ -107,7 +115,7 @@ function GuestNotifications() {
         style={{ display: "none" }}
         muted={!soundEnabled}
       />
-      <ul className="notification-list">
+      <ul className="notification-list" ref={listRef}>
         {notifications.map((notification) => {
           // Calculate arrival time
           let arrivalTime = "";

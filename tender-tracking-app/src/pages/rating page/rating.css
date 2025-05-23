@@ -12,6 +12,10 @@
   flex-direction: column;
   justify-content: flex-start;
   gap: 20px;
+  height: 100vh;
+  max-height: 100vh;
+  overflow-y: auto;
+
 }
 
 .feedback-website h1 {
@@ -177,6 +181,7 @@
     /* Further reduced padding for mobile */
     margin: 5px auto;
     /* Further reduced margin for mobile */
+
   }
 
   .feedback-website h1 {
