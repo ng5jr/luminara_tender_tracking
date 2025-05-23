@@ -2,9 +2,7 @@
 body {
   box-sizing: border-box;
   background-color: #1c1c1c;
-  overflow: hidden;
-  height: 100vh;
-  margin: 0;
+
 }
 
 .guest-notifications {
@@ -165,9 +163,9 @@ body {
     /* Further reduced padding for mobile */
     margin: 5px auto;
     /* Further reduced margin for mobile */
-    height: calc(100vh - 10px);
+    height: calc(100vh - 20px);
     /* Subtract top+bottom margin */
-    max-height: calc(100vh - 10px);
+    max-height: calc(100vh - 20px);
   }
 
   .guest-notifications h1 {

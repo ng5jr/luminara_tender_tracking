@@ -125,16 +125,17 @@ function Rating() {
             rows="4"
           />
         </div>
+
+        <button
+          onClick={handleSubmitFeedback}
+          disabled={websiteRating === 0 || tenderRating === 0}
+        >
+          Submit Feedback
+        </button>
+        {submissionStatus && (
+          <p className="submission-status">{submissionStatus}</p>
+        )}
       </div>
-      <button
-        onClick={handleSubmitFeedback}
-        disabled={websiteRating === 0 || tenderRating === 0}
-      >
-        Submit Feedback
-      </button>
-      {submissionStatus && (
-        <p className="submission-status">{submissionStatus}</p>
-      )}
     </div>
   );
 }

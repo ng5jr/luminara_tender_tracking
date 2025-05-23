@@ -1,5 +1,4 @@
 .feedback-website {
-  box-sizing: border-box;
   font-family: 'Big Caslon', 'Times New Roman', serif;
   margin: 10px auto;
   padding: 35px 35px;
@@ -13,12 +12,8 @@
   flex-direction: column;
   justify-content: flex-start;
   gap: 20px;
-  height: calc(100vh - 20px);
-  /* Subtract top+bottom margin */
-  max-height: calc(100vh - 20px);
-  overflow: hidden;
-  /* Prevent outer scroll */
 }
+
 
 .feedback-website h1 {
   font-family: 'Big Caslon', 'Times New Roman', serif;
@@ -177,27 +172,12 @@
   color: #c7ddf3;
 }
 
-.sections {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  min-height: 0;
-  scrollbar-width: none;
-  /* Firefox */
-  -ms-overflow-style: none;
-  /* IE and Edge */
-}
-
-.sections::-webkit-scrollbar {
-  display: none;
-  /* Chrome, Safari, Opera */
-}
-
 @media screen and (max-width: 600px) {
   .feedback-website {
     padding: 20px 15px;
+    /* Further reduced padding for mobile */
     margin: 5px auto;
-    height: calc(100vh - 10px);
-    max-height: calc(100vh - 10px);
+    /* Further reduced margin for mobile */
   }
 
   .feedback-website h1 {
