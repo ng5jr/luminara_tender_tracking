@@ -302,10 +302,10 @@ const Logo = ({ page, enableSound, soundEnabled, tv }) => {
             <span>Notifications</span>
 
           </Link>
-          <Link className="header-link" to="/map">
-            <span>Live Tracker</span>
-            {/* <FaMapLocationDot /> */}
-          </Link>
+          {/* <Link className="header-link" to="/map">
+            <span>Live Tracker</span> */}
+          {/* <FaMapLocationDot /> */}
+          {/* </Link> */}
           <Link className="header-link" to="/feedback">
             <span>Feedback</span>
             {/* <SlLike /> */}
