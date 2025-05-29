@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { db } from "../../firebaseconfig";
 import { collection, query, orderBy, where, onSnapshot, getDocs, limit } from "firebase/firestore";
 import notificationSound from "../../assets/notification.mp3";
-
 import "./guestnotifications.css";
 import Logo from "../../components/logo.js";
 
