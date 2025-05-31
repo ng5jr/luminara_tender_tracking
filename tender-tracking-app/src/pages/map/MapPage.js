@@ -27,6 +27,7 @@ const MyMap = () => {
         const pierLoc = doc.data().pierLocation;
         if (pierLoc && pierLoc.lat && pierLoc.lng) {
           setPierLocation([pierLoc.lat, pierLoc.lng]);
+          console.log("Pier Location:", pierLoc);
         }
       }
     };
@@ -37,6 +38,7 @@ const MyMap = () => {
     <div className="guest-notifications">
       <Logo page="no-sound" />
       <h1>TENDER TRACKING MAP</h1>
+      <h2 className='map-h2'>Interact with the tenders for Arrival Times</h2>
       <div style={{ height: '80vh', width: '100%' }}>
         <ShipMap pierLocation={pierLocation} />
       </div>

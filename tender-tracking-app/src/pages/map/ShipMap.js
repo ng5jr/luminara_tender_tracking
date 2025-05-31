@@ -8,6 +8,7 @@ import 'leaflet-rotatedmarker';
 import 'leaflet/dist/leaflet.css';
 import * as VIAM from '@viamrobotics/sdk';
 import './ShipMap.css';
+import PredictedMovingMarker from './PredictedMovingMarker.js';
 
 const shipIcon = L.icon({
     iconUrl: boat,
@@ -19,8 +20,8 @@ const shipIcon = L.icon({
 const locationIcon = L.icon({
     iconUrl: Location,
     iconSize: [24, 32],
-    iconAnchor: [12, 16],
-    popupAnchor: [0, -16],
+    iconAnchor: [12, 32], // <-- bottom center
+    popupAnchor: [0, -32],
 });
 
 const tenderIcon = L.icon({
@@ -39,9 +40,14 @@ const ShipMap = ({ pierLocation }) => {
     const [tender3Heading, setStender3Heading] = useState(0);
     const [tender4Heading, setStender4Heading] = useState(0);
 
+    const [tender3SOG, setTender3SOG] = useState(0);
+    const [tender3COG, setTender3COG] = useState(0);
+    const [tender3LastReceived, setTender3LastReceived] = useState(null);
+
     const [shipLastReceived, setShipLastReceived] = useState(null);
-    const [tender3LastReceived, setTender3LastReceived] = useState(null); // NEW
-    const [tender4LastReceived, setTender4LastReceived] = useState(null); // NEW
+    const [tender4LastReceived, setTender4LastReceived] = useState(null);
+    const [tender4SOG, setTender4SOG] = useState(0);
+    const [tender4COG, setTender4COG] = useState(0);
 
     const shipMarkerRef = useRef(null);
     const tender3MarkerRef = useRef(null);
@@ -55,6 +61,7 @@ const ShipMap = ({ pierLocation }) => {
         let machine = null;
         let allPgnClient = null;
         let isMounted = true;
+        let interval = null;
 
         const connectViam = async () => {
             machine = await VIAM.createRobotClient({
@@ -90,10 +97,17 @@ const ShipMap = ({ pierLocation }) => {
                     v => v["User ID"] === 982150013 && v.Latitude && v.Longitude
                 );
                 if (tender3 && isMounted) {
-                    setTender3Position([tender3.Latitude, tender3.Longitude]);
-                    setStender3Heading(tender3.COG ?? 0);
-                    setTender3LastReceived(new Date()); // NEW
-                    console.log("Tender 3 position:", tender3, tender3.COG);
+                    setTender3SOG(tender3.SOG ?? 0);
+                    setTender3COG(prev => tender3.COG != null ? tender3.COG : prev);
+                    setTender3LastReceived(new Date());
+
+                    setTender3Position(prev => {
+                        if (!prev || prev[0] !== tender3.Latitude || prev[1] !== tender3.Longitude) {
+                            return [tender3.Latitude, tender3.Longitude];
+                        }
+                        return prev; // Don't update if position hasn't changed
+                    });
+                    console.log("Tender 3 position:", [tender3.Latitude, tender3.Longitude], "Tender 3 Heading:", tender3.COG, "Tender 3 Speed:", tender3.SOG);
                 }
 
                 // Tender 4
@@ -101,10 +115,17 @@ const ShipMap = ({ pierLocation }) => {
                     v => v["User ID"] === 982150014 && v.Latitude && v.Longitude
                 );
                 if (tender4 && isMounted) {
-                    setTender4Position([tender4.Latitude, tender4.Longitude]);
-                    setStender4Heading(tender4.COG ?? 0);
-                    setTender4LastReceived(new Date()); // NEW
-                    console.log("Tender 4 position:", tender4, tender4.COG);
+                    setTender4SOG(tender4.SOG ?? 0);
+                    setTender4COG(prev => tender4.COG != null ? tender4.COG : prev);
+                    setTender4LastReceived(new Date());
+
+                    setTender4Position(prev => {
+                        if (!prev || prev[0] !== tender4.Latitude || prev[1] !== tender4.Longitude) {
+                            return [tender4.Latitude, tender4.Longitude];
+                        }
+                        return prev;
+                    });
+                    console.log("Tender 4 position:", [tender4.Latitude, tender4.Longitude], "Tender 4 Heading:", tender4.COG, "Tender 4 Speed:", tender4.SOG);
                 }
 
             } catch (err) {
@@ -114,15 +135,12 @@ const ShipMap = ({ pierLocation }) => {
 
         connectViam().then(() => {
             fetchViamData();
-            const interval = setInterval(fetchViamData, 1000);
-            return () => {
-                isMounted = false;
-                clearInterval(interval);
-                if (machine && machine.close) machine.close();
-            };
+            interval = setInterval(fetchViamData, 2000);
         });
 
         return () => {
+            isMounted = false;
+            if (interval) clearInterval(interval);
             if (machine && machine.close) machine.close();
         };
     }, []);
@@ -175,6 +193,8 @@ const ShipMap = ({ pierLocation }) => {
         };
     }, [shipPosition]);
 
+
+
     if (!mapCenter || !shipPosition) {
         return (
             <div className="loading-container">
@@ -193,7 +213,7 @@ const ShipMap = ({ pierLocation }) => {
                     <line x1="12" y1="2" x2="12" y2="6" stroke="#fff" strokeWidth="2" />
                     <line x1="12" y1="18" x2="12" y2="22" stroke="#fff" strokeWidth="2" />
                     <line x1="2" y1="12" x2="6" y2="12" stroke="#fff" strokeWidth="2" />
-                    <line x1="18" y1="12" x2="22" y2="12" stroke="#fff" strokeWidth="2" />
+                    <line x1="18" y1="12" x2="22" y2="12" strokeWidth="2" />
                 </svg>
                 <span>Evrima</span>
             </button>
@@ -252,7 +272,7 @@ const ShipMap = ({ pierLocation }) => {
                 </Popup>
             </Marker>
 
-            {tender3Position && (
+            {/* {tender3Position && (
                 <Marker
                     position={tender3Position}
                     icon={tenderIcon}
@@ -270,36 +290,46 @@ const ShipMap = ({ pierLocation }) => {
                         )}
                     </Popup>
                 </Marker>
-            )}
-
-            {tender4Position && (
-                <Marker
-                    position={tender4Position}
-                    icon={tenderIcon}
-                    rotationAngle={tender4Heading - 90}
-                    rotationOrigin="center"
-                    ref={tender4MarkerRef}
-                    zIndexOffset={2002}
-                >
-                    <Popup className="custom-popup">
-                        Tender 4<br />
-                        {tender4LastReceived && (
-                            <span style={{ fontSize: '0.7em', color: '#aaa' }}>
-                                LAST RECEIVED: {tender4LastReceived.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
-                            </span>
-                        )}
-                    </Popup>
-                </Marker>
-            )}
+            )} */}
 
             {pierLocation && (
-                <Marker position={pierLocation} icon={locationIcon}>
+                <Marker position={pierLocation} icon={locationIcon} rotationAngle={0} rotationOrigin="center">
                     <Popup className="custom-popup">Pier Location</Popup>
                 </Marker>
             )}
 
             {shipPosition && <CenterMapButton position={shipPosition} />}
             {pierLocation && <CenterPierButton position={pierLocation} />}
+
+
+            {tender3Position && (
+                <PredictedMovingMarker
+                    position={tender3Position}
+                    sog={tender3SOG}
+                    cog={tender3COG}
+                    lastReceived={tender3LastReceived}
+                    icon={tenderIcon}
+                    zIndexOffset={1001}
+                    name="Tender 3"
+                    markerRef={tender3MarkerRef}
+                    shipPosition={shipPosition}
+                    pierLocation={pierLocation}
+                />
+            )}
+            {tender4Position && (
+                <PredictedMovingMarker
+                    position={tender4Position}
+                    sog={tender4SOG}
+                    cog={tender4COG}
+                    lastReceived={tender4LastReceived}
+                    icon={tenderIcon}
+                    zIndexOffset={2002}
+                    name="Tender 4"
+                    markerRef={tender4MarkerRef}
+                    shipPosition={shipPosition}
+                    pierLocation={pierLocation}
+                />
+            )}
         </MapContainer>
     );
 };

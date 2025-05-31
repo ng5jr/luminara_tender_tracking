@@ -12,6 +12,10 @@
 
 }
 
+.leaflet-popup-content {
+    margin: 15px 10px 10px 10px;
+}
+
 .leaflet-control-attribution {
     background: rgba(2, 1, 66, 0.7) !important;
     /* semi-transparent dark background */
