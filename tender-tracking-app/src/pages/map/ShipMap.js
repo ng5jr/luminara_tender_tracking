@@ -37,8 +37,7 @@ const ShipMap = ({ pierLocation }) => {
     const [tender3Position, setTender3Position] = useState(null);
     const [tender4Position, setTender4Position] = useState(null);
     const [shipHeading, setShipHeading] = useState(0);
-    const [tender3Heading, setStender3Heading] = useState(0);
-    const [tender4Heading, setStender4Heading] = useState(0);
+
 
     const [tender3SOG, setTender3SOG] = useState(0);
     const [tender3COG, setTender3COG] = useState(0);

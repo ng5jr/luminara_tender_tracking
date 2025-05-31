@@ -77,9 +77,18 @@ const PredictedMovingMarker = ({
     });
     const animationRef = useRef();
 
-    // When a new position is received, jump to it and update the reference
+    // When a new position is received, only jump if it's different from the last animated position
     useEffect(() => {
-        setAnimatedPosition(position);
+        // Use a small threshold to avoid floating point issues (e.g., 1 meter)
+        if (haversine(animatedPosition, position) > 1) {
+            setAnimatedPosition(position);
+        }
+        // else: keep animating from where we are
+        // eslint-disable-next-line
+    }, [position]);
+
+    // Always keep the latest values for animation and info
+    useEffect(() => {
         lastUpdateRef.current = { position, sog, cog, lastReceived };
     }, [position, sog, cog, lastReceived]);
 
@@ -91,16 +100,7 @@ const PredictedMovingMarker = ({
 
             const { position: startPos, sog: lastSog, cog: lastCog, lastReceived: lastTime } = lastUpdateRef.current;
             if (!startPos || lastSog == null || lastCog == null || !lastTime || lastSog <= 0.5) {
-                setAnimatedPosition(prev => {
-                    if (
-                        !prev ||
-                        prev[0] !== startPos[0] ||
-                        prev[1] !== startPos[1]
-                    ) {
-                        return startPos;
-                    }
-                    return prev;
-                });
+                // Do NOT update animatedPosition here; let the useEffect below handle it
             } else {
                 const now = Date.now();
                 const elapsedSeconds = (now - lastTime.getTime()) / 1000;
