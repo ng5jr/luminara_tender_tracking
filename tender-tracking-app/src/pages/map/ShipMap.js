@@ -88,7 +88,7 @@ const ShipMap = ({ pierLocation }) => {
                     setShipPosition([ship.Latitude, ship.Longitude]);
                     setShipHeading(ship.Heading || 0);
                     setShipLastReceived(new Date());
-                    console.log("Ship position:", [ship.Latitude, ship.Longitude], "Ship Heading:", ship.Heading);
+                    console.log("Ship position:", [ship.Latitude, ship.Longitude], "Ship Heading:", ship.Heading, "Ship Speed:", ship.SOG);
                 }
 
                 // Tender 3
@@ -254,6 +254,7 @@ const ShipMap = ({ pierLocation }) => {
                 attribution='&copy; CNES, Airbus DS, PlanetObserver, Copernicus | &copy; <a href="https://www.stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             />
             <Marker
+                key={shipHeading} // <-- Add this line
                 position={shipPosition}
                 icon={shipIcon}
                 rotationAngle={shipHeading - 90}
