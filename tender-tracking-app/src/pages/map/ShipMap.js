@@ -91,7 +91,7 @@ const ShipMap = ({ pierLocation }) => {
                 );
                 if (tender3 && isMounted) {
                     setTender3Position([tender3.Latitude, tender3.Longitude]);
-                    setStender3Heading(tender3.COG || 0);
+                    setStender3Heading(tender3.COG ?? 0);
                     setTender3LastReceived(new Date()); // NEW
                     console.log("Tender 3 position:", tender3, tender3.COG);
                 }
@@ -102,7 +102,7 @@ const ShipMap = ({ pierLocation }) => {
                 );
                 if (tender4 && isMounted) {
                     setTender4Position([tender4.Latitude, tender4.Longitude]);
-                    setStender4Heading(tender4.COG || 0);
+                    setStender4Heading(tender4.COG ?? 0);
                     setTender4LastReceived(new Date()); // NEW
                     console.log("Tender 4 position:", tender4, tender4.COG);
                 }
