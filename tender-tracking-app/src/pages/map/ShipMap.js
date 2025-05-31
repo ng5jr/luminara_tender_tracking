@@ -231,7 +231,7 @@ const ShipMap = ({ pierLocation }) => {
             style={{ height: '100%', width: '100%' }}
         >
             <TileLayer
-                url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.jpg"
+                url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.jpg??api_key=b86c5acf-0c86-4560-b72f-5657b6b741e5"
                 attribution='&copy; CNES, Airbus DS, PlanetObserver, Copernicus | &copy; <a href="https://www.stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             />
             <Marker
