@@ -99,7 +99,7 @@ const PredictedMovingMarker = ({
             if (!running) return;
 
             const { position: startPos, sog: lastSog, cog: lastCog, lastReceived: lastTime } = lastUpdateRef.current;
-            if (!startPos || lastSog == null || lastCog == null || !lastTime || lastSog <= 0.5) {
+            if (!startPos || lastSog == null || lastCog == null || !lastTime || lastSog <= 0.9) {
                 // Do NOT update animatedPosition here; let the useEffect below handle it
             } else {
                 const now = Date.now();
@@ -178,6 +178,10 @@ const PredictedMovingMarker = ({
                 {toShip !== null && toShip < 60 ? (
                     <span style={{ fontSize: '0.7em', color: '#4caf50' }}>
                         Arrived to Evrima
+                    </span>
+                ) : toPier !== null && toPier < 100 ? (
+                    <span style={{ fontSize: '0.7em', color: '#2196f3' }}>
+                        Arrived to the Pier
                     </span>
                 ) : destination && (
                     <span style={{ fontSize: '0.7em', color: '#aaa' }}>

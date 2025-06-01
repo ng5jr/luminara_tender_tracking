@@ -225,7 +225,7 @@ const ShipMap = ({ pierLocation }) => {
             <button
                 className="center-map-btn pier-btn"
                 style={{ top: 60 }}
-                onClick={() => map.flyTo(position, map.getZoom(), { animate: true, duration: 1.5 })}
+                onClick={() => map.flyTo(position, 16, { animate: true, duration: 1.5 })}
             >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="12" r="10" stroke="#fff" strokeWidth="2" />
@@ -244,8 +244,8 @@ const ShipMap = ({ pierLocation }) => {
         <MapContainer
             center={mapCenter}
             zoom={16}
-            minZoom={10}
-            maxZoom={20}
+            minZoom={14}
+            maxZoom={16.5}
             scrollWheelZoom={true}
             style={{ height: '100%', width: '100%' }}
         >
@@ -330,8 +330,26 @@ const ShipMap = ({ pierLocation }) => {
                     pierLocation={pierLocation}
                 />
             )}
+
+            <LogZoom />
         </MapContainer>
     );
+};
+
+const LogZoom = () => {
+    const map = useMap();
+    useEffect(() => {
+        const onZoom = () => {
+            console.log('Current zoom:', map.getZoom());
+        };
+        map.on('zoomend', onZoom);
+        // Log initial zoom
+        console.log('Initial zoom:', map.getZoom());
+        return () => {
+            map.off('zoomend', onZoom);
+        };
+    }, [map]);
+    return null;
 };
 
 export default ShipMap;
