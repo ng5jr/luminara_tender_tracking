@@ -8,6 +8,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebaseconfig";
 
 import ShipMap from './ShipMap.js';
+import ShipMapRTDB from './MapRTDB.js';
 
 
 
@@ -37,8 +38,11 @@ const MyMap = () => {
       <h1>TENDER TRACKING MAP</h1>
       <h2 className='map-h2'>Interact with the tenders for Arrival Times</h2>
       <div style={{ height: '80vh', width: '100%' }}>
-        <ShipMap pierLocation={pierLocation} />
+        <ShipMapRTDB pierLocation={pierLocation} />
       </div>
+      {/* <div style={{ height: '80vh', width: '100%' }}>
+        <ShipMap pierLocation={pierLocation} />
+      </div> */}
     </div>
   );
 };
