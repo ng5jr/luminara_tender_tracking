@@ -4,10 +4,10 @@ import 'leaflet/dist/leaflet.css';
 import './MapPage.css';
 
 import Logo from '../../components/logo';
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebaseconfig";
 
-import ShipMap from './ShipMap.js';
+// import ShipMap from './ShipMap.js';
 import ShipMapRTDB from './MapRTDB.js';
 
 
@@ -19,7 +19,11 @@ const MyMap = () => {
 
   useEffect(() => {
     const fetchPierLocation = async () => {
-      const portDaysSnapshot = await getDocs(collection(db, "portDays"));
+      const q = query(
+        collection(db, "portDays"),
+        where("isActive", "==", true)
+      );
+      const portDaysSnapshot = await getDocs(q);
       if (!portDaysSnapshot.empty) {
         const doc = portDaysSnapshot.docs[0];
         const pierLoc = doc.data().pierLocation;

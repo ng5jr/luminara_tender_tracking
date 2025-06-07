@@ -6,14 +6,14 @@ import Location from "../../assets/position.png";
 import tender3IconImg from '../../assets/evrimatender.png';
 import 'leaflet-rotatedmarker';
 import 'leaflet/dist/leaflet.css';
-import { getDatabase, ref, onValue, off } from 'firebase/database';
+import { ref, onValue, off } from 'firebase/database';
 import { rtdb } from '../../firebaseconfig'; import './ShipMap.css';
 import PredictedMovingMarker from './PredictedMovingMarker.js';
 
 const shipIcon = L.icon({
     iconUrl: boat,
     iconSize: [80, 17],
-    iconAnchor: [40, 9],
+    iconAnchor: [60, 8.5],
     popupAnchor: [0, -9],
 });
 
@@ -31,6 +31,13 @@ const tenderIcon = L.icon({
     popupAnchor: [0, -7],
 });
 
+const shipDotIcon = L.divIcon({
+    className: 'ship-dot-icon',
+    html: '<div style="width:4px;height:4px;background:#ff3333;border:2px solid #fff;border-radius:50%;box-shadow:0 0 6px #000a;"></div>',
+    iconSize: [12, 12],
+    iconAnchor: [6, 6],
+});
+
 const ShipMapRTDB = ({ pierLocation }) => {
     const [mapCenter, setMapCenter] = useState(null);
     const [shipPosition, setShipPosition] = useState(null);
@@ -38,18 +45,20 @@ const ShipMapRTDB = ({ pierLocation }) => {
     const [shipLastReceived, setShipLastReceived] = useState(null);
     const [tender3Position, setTender3Position] = useState(null);
     const [tender3Heading, setTender3Heading] = useState(0);
+    const [tender3Speed, setTender3Speed] = useState(0);
     const [tender3LastReceived, setTender3LastReceived] = useState(null);
     const [tender4Position, setTender4Position] = useState(null);
     const [tender4Heading, setTender4Heading] = useState(0);
+    const [tender4Speed, setTender4Speed] = useState(0);
     const [tender4LastReceived, setTender4LastReceived] = useState(null);
 
     const shipMarkerRef = useRef(null);
     const tender3MarkerRef = useRef(null);
     const tender4MarkerRef = useRef(null);
-    const animationRef = useRef();
+    // const animationRef = useRef();
     const lastAnimatedPositionRef = useRef(null);
 
-    const ANIMATION_DURATION = 5000;
+    // const ANIMATION_DURATION = 5000;
 
     useEffect(() => {
         const db = rtdb;
@@ -71,6 +80,7 @@ const ShipMapRTDB = ({ pierLocation }) => {
             if (data && data.lat && data.lon) {
                 setTender3Position([data.lat, data.lon]);
                 setTender3Heading(data.heading || 0);
+                setTender3Speed(data.speed || 0);
                 setTender3LastReceived(new Date(data.timestamp));
                 console.log('Tender 3 position:', [data.lat, data.lon], 'Tender 3 Heading:', data.heading, 'Tender 3 Speed:', data.speed);
             }
@@ -80,6 +90,7 @@ const ShipMapRTDB = ({ pierLocation }) => {
             if (data && data.lat && data.lon) {
                 setTender4Position([data.lat, data.lon]);
                 setTender4Heading(data.heading || 0);
+                setTender4Speed(data.speed || 0);
                 setTender4LastReceived(new Date(data.timestamp));
                 console.log('Tender 4 position:', [data.lat, data.lon], 'Tender 4 Heading:', data.heading, 'Tender 4 Speed:', data.speed);
             }
@@ -167,7 +178,7 @@ const ShipMapRTDB = ({ pierLocation }) => {
                 position={shipPosition}
                 icon={shipIcon}
                 rotationAngle={shipHeading - 90}
-                rotationOrigin="center"
+                rotationOrigin="60px 8.5px" // <-- Adjusted to match the icon anchor
                 ref={shipMarkerRef}
                 zIndexOffset={100}
             >
@@ -181,7 +192,7 @@ const ShipMapRTDB = ({ pierLocation }) => {
                 </Popup>
             </Marker>
 
-            {tender3Position && (
+            {/* {tender3Position && (
                 <Marker
                     key={tender3Heading}
                     position={tender3Position}
@@ -220,7 +231,7 @@ const ShipMapRTDB = ({ pierLocation }) => {
                         )}
                     </Popup>
                 </Marker>
-            )}
+            )} */}
 
             {pierLocation && (
                 <Marker position={pierLocation} icon={locationIcon} rotationAngle={0} rotationOrigin="center">
@@ -232,11 +243,11 @@ const ShipMapRTDB = ({ pierLocation }) => {
             {pierLocation && <CenterPierButton position={pierLocation} />}
 
 
-            {/* {tender3Position && (
+            {tender3Position && (
                 <PredictedMovingMarker
                     position={tender3Position}
-                    sog={tender3SOG}
-                    cog={tender3COG}
+                    sog={tender3Speed}
+                    cog={tender3Heading}
                     lastReceived={tender3LastReceived}
                     icon={tenderIcon}
                     zIndexOffset={1001}
@@ -249,8 +260,8 @@ const ShipMapRTDB = ({ pierLocation }) => {
             {tender4Position && (
                 <PredictedMovingMarker
                     position={tender4Position}
-                    sog={tender4SOG}
-                    cog={tender4COG}
+                    sog={tender4Speed}
+                    cog={tender4Heading}
                     lastReceived={tender4LastReceived}
                     icon={tenderIcon}
                     zIndexOffset={2002}
@@ -258,6 +269,15 @@ const ShipMapRTDB = ({ pierLocation }) => {
                     markerRef={tender4MarkerRef}
                     shipPosition={shipPosition}
                     pierLocation={pierLocation}
+                />
+            )}
+
+            {/* {shipPosition && (
+                <Marker
+                    position={shipPosition}
+                    icon={shipDotIcon}
+                    zIndexOffset={9999}
+                    interactive={false}
                 />
             )} */}
 

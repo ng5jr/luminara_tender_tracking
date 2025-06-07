@@ -120,7 +120,7 @@ const PredictedMovingMarker = ({
     }, []);
 
     // Use animatedPosition for display
-    let displayPosition = animatedPosition;
+    let displayPosition = position;
 
     // --- Calculate ETA and distance based on last received position ---
     let destination = null, etaSeconds = null, distanceMeters = null;
@@ -175,7 +175,7 @@ const PredictedMovingMarker = ({
                         Last Received: {lastReceived.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                     </span>
                 )}<br />
-                {toShip !== null && toShip < 60 ? (
+                {toShip !== null && toShip < 100 ? (
                     <span style={{ fontSize: '0.7em', color: '#4caf50' }}>
                         Arrived to Evrima
                     </span>
@@ -185,7 +185,7 @@ const PredictedMovingMarker = ({
                     </span>
                 ) : destination && (
                     <span style={{ fontSize: '0.7em', color: '#aaa' }}>
-                        Distance to {destination}: <b>{Math.round(distanceMeters)} m</b><br />
+                        {/* Distance to {destination}: <b>{Math.round(distanceMeters)} m</b><br /> */}
                         {(etaSeconds && etaSeconds > 0) && (
                             <>
                                 ETA to {destination}: <b>{formatClockTime(lastReceived, etaSeconds)}</b><br />
