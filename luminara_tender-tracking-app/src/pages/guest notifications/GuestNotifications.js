@@ -42,6 +42,7 @@ function GuestNotifications() {
           setPortName(activePortDayDoc.data().name || "");
           setAvgTime(activePortDayDoc.data().avgTime || 0);
           setLastTender(activePortDayDoc.data().lastTenderTime || "TBA");
+          console.log("Active Port Day: ", activePortDayDoc.data());
 
 
           // Unsubscribe from previous notifications listener if any
