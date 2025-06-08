@@ -1,6 +1,6 @@
 import { auth, signInWithPopup, googleAuthProvider, signOut } from '../firebaseconfig';
 
-const ALLOWED_EMAIL = 'evrimatenderrcyc@gmail.com';
+const ALLOWED_EMAIL = 'Luminaratenderrcyc@gmail.com';
 export const handleGoogleSignIn = async () => {
   try {
     const result = await signInWithPopup(auth, googleAuthProvider);

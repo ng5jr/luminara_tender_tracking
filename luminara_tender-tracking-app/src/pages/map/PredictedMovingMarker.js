@@ -132,7 +132,7 @@ const PredictedMovingMarker = ({
         if (sog > 0.5) {
             const speed = sog * 0.514444;
             if (isHeadingTo(cog, position, shipPosition)) {
-                destination = "Evrima";
+                destination = "Luminara";
                 etaSeconds = toShip / speed;
                 distanceMeters = toShip;
             } else if (isHeadingTo(cog, position, pierLocation)) {
@@ -143,7 +143,7 @@ const PredictedMovingMarker = ({
         } else {
             // Stopped: show distance to closest destination
             if (toShip < toPier) {
-                destination = "Evrima";
+                destination = "Luminara";
                 distanceMeters = toShip;
             } else {
                 destination = "Pier";
@@ -177,7 +177,7 @@ const PredictedMovingMarker = ({
                 )}<br />
                 {toShip !== null && toShip < 100 ? (
                     <span style={{ fontSize: '0.7em', color: '#4caf50' }}>
-                        Arrived to Evrima
+                        Arrived to Luminara
                     </span>
                 ) : toPier !== null && toPier < 100 ? (
                     <span style={{ fontSize: '0.7em', color: '#2196f3' }}>

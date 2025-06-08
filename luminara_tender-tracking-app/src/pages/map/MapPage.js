@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import './MapPage.css';
 
-import Logo from '../../components/logo';
+import Logo from '../../components/logo.js';
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../../firebaseconfig";
+import { db } from "../../firebaseconfig.js";
 
 // import ShipMap from './ShipMap.js';
 import ShipMapRTDB from './MapRTDB.js';

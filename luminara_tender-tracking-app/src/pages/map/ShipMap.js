@@ -3,17 +3,17 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import boat from '../../assets/shipimg.png';
 import Location from "../../assets/position.png";
-import tender3IconImg from '../../assets/evrimatender.png';
+import tender3IconImg from '../../assets/Luminaratender.png';
 import 'leaflet-rotatedmarker';
 import 'leaflet/dist/leaflet.css';
-import { ref, onValue, off } from 'firebase/database';
-import { rtdb } from '../../firebaseconfig'; import './ShipMap.css';
+import * as VIAM from '@viamrobotics/sdk';
+import './ShipMap.css';
 import PredictedMovingMarker from './PredictedMovingMarker.js';
 
 const shipIcon = L.icon({
     iconUrl: boat,
     iconSize: [80, 17],
-    iconAnchor: [60, 8.5],
+    iconAnchor: [40, 9],
     popupAnchor: [0, -9],
 });
 
@@ -31,79 +31,116 @@ const tenderIcon = L.icon({
     popupAnchor: [0, -7],
 });
 
-const shipDotIcon = L.divIcon({
-    className: 'ship-dot-icon',
-    html: '<div style="width:4px;height:4px;background:#ff3333;border:2px solid #fff;border-radius:50%;box-shadow:0 0 6px #000a;"></div>',
-    iconSize: [12, 12],
-    iconAnchor: [6, 6],
-});
-
-const ShipMapRTDB = ({ pierLocation }) => {
+const ShipMap = ({ pierLocation }) => {
     const [mapCenter, setMapCenter] = useState(null);
     const [shipPosition, setShipPosition] = useState(null);
-    const [shipHeading, setShipHeading] = useState(0);
-    const [shipLastReceived, setShipLastReceived] = useState(null);
     const [tender3Position, setTender3Position] = useState(null);
-    const [tender3Heading, setTender3Heading] = useState(0);
-    const [tender3Speed, setTender3Speed] = useState(0);
-    const [tender3LastReceived, setTender3LastReceived] = useState(null);
     const [tender4Position, setTender4Position] = useState(null);
-    const [tender4Heading, setTender4Heading] = useState(0);
-    const [tender4Speed, setTender4Speed] = useState(0);
+    const [shipHeading, setShipHeading] = useState(0);
+
+
+    const [tender3SOG, setTender3SOG] = useState(0);
+    const [tender3COG, setTender3COG] = useState(0);
+    const [tender3LastReceived, setTender3LastReceived] = useState(null);
+
+    const [shipLastReceived, setShipLastReceived] = useState(null);
     const [tender4LastReceived, setTender4LastReceived] = useState(null);
+    const [tender4SOG, setTender4SOG] = useState(0);
+    const [tender4COG, setTender4COG] = useState(0);
 
     const shipMarkerRef = useRef(null);
     const tender3MarkerRef = useRef(null);
     const tender4MarkerRef = useRef(null);
-    // const animationRef = useRef();
+    const animationRef = useRef();
     const lastAnimatedPositionRef = useRef(null);
 
-    // const ANIMATION_DURATION = 5000;
+    const ANIMATION_DURATION = 5000;
 
     useEffect(() => {
-        const db = rtdb;
-        const shipRef = ref(db, 'positions/ship/latest');
-        const tender3Ref = ref(db, 'positions/tender3/latest');
-        const tender4Ref = ref(db, 'positions/tender4/latest');
+        let machine = null;
+        let allPgnClient = null;
+        let isMounted = true;
+        let interval = null;
 
-        const handleShipUpdate = (snapshot) => {
-            const data = snapshot.val();
-            if (data && data.lat && data.lon) {
-                setShipPosition([data.lat, data.lon]);
-                setShipHeading(data.heading || 0);
-                setShipLastReceived(new Date(data.timestamp));
-                console.log('RTDB Ship position:', [data.lat, data.lon], 'Ship Heading:', data.heading, 'Ship Speed:', data.speed, "Received at:", new Date().toLocaleTimeString());
-            }
-        };
-        const handleTender3Update = (snapshot) => {
-            const data = snapshot.val();
-            if (data && data.lat && data.lon) {
-                setTender3Position([data.lat, data.lon]);
-                setTender3Heading(data.heading || 0);
-                setTender3Speed(data.speed || 0);
-                setTender3LastReceived(new Date(data.timestamp));
-                console.log('Tender 3 position:', [data.lat, data.lon], 'Tender 3 Heading:', data.heading, 'Tender 3 Speed:', data.speed);
-            }
-        };
-        const handleTender4Update = (snapshot) => {
-            const data = snapshot.val();
-            if (data && data.lat && data.lon) {
-                setTender4Position([data.lat, data.lon]);
-                setTender4Heading(data.heading || 0);
-                setTender4Speed(data.speed || 0);
-                setTender4LastReceived(new Date(data.timestamp));
-                console.log('Tender 4 position:', [data.lat, data.lon], 'Tender 4 Heading:', data.heading, 'Tender 4 Speed:', data.speed);
-            }
+        const connectViam = async () => {
+            machine = await VIAM.createRobotClient({
+                host: 'njordlinkplus.u1ho16k8rd.viam.cloud',
+                credentials: {
+                    type: 'api-key',
+                    payload: 'g7wj2rvi8jzujdacjw4kifr4nh2e3qs1',
+                    authEntity: '42e9d6a7-549d-4d88-8897-6b088eaeadc5',
+                },
+                signalingAddress: 'https://app.viam.com:443',
+            });
+            allPgnClient = new VIAM.SensorClient(machine, 'all-pgn');
         };
 
-        onValue(shipRef, handleShipUpdate);
-        onValue(tender3Ref, handleTender3Update);
-        onValue(tender4Ref, handleTender4Update);
+        const fetchViamData = async () => {
+            if (!allPgnClient) return;
+            try {
+                const data = await allPgnClient.getReadings();
+
+                // Ship
+                const ship = Object.values(data).find(
+                    v => v["User ID"] === 215001000 && v.Latitude && v.Longitude
+                );
+                if (ship && isMounted) {
+                    setShipPosition([ship.Latitude, ship.Longitude]);
+                    setShipHeading(ship.Heading || 0);
+                    setShipLastReceived(new Date());
+                    console.log("Ship position:", [ship.Latitude, ship.Longitude], "Ship Heading:", ship.Heading, "Ship Speed:", ship.SOG, "Received at:", new Date().toLocaleTimeString());
+                }
+
+                // Tender 3
+                const tender3 = Object.values(data).find(
+                    v => v["User ID"] === 982150013 && v.Latitude && v.Longitude
+                );
+                if (tender3 && isMounted) {
+                    setTender3SOG(tender3.SOG ?? 0);
+                    setTender3COG(prev => tender3.COG != null ? tender3.COG : prev);
+                    setTender3LastReceived(new Date());
+
+                    setTender3Position(prev => {
+                        if (!prev || prev[0] !== tender3.Latitude || prev[1] !== tender3.Longitude) {
+                            return [tender3.Latitude, tender3.Longitude];
+                        }
+                        return prev; // Don't update if position hasn't changed
+                    });
+                    console.log("Tender 3 position:", [tender3.Latitude, tender3.Longitude], "Tender 3 Heading:", tender3.COG, "Tender 3 Speed:", tender3.SOG);
+                }
+
+                // Tender 4
+                const tender4 = Object.values(data).find(
+                    v => v["User ID"] === 982150014 && v.Latitude && v.Longitude
+                );
+                if (tender4 && isMounted) {
+                    setTender4SOG(tender4.SOG ?? 0);
+                    setTender4COG(prev => tender4.COG != null ? tender4.COG : prev);
+                    setTender4LastReceived(new Date());
+
+                    setTender4Position(prev => {
+                        if (!prev || prev[0] !== tender4.Latitude || prev[1] !== tender4.Longitude) {
+                            return [tender4.Latitude, tender4.Longitude];
+                        }
+                        return prev;
+                    });
+                    console.log("Tender 4 position:", [tender4.Latitude, tender4.Longitude], "Tender 4 Heading:", tender4.COG, "Tender 4 Speed:", tender4.SOG);
+                }
+
+            } catch (err) {
+                console.error("Error fetching VIAM data:", err);
+            }
+        };
+
+        connectViam().then(() => {
+            fetchViamData();
+            interval = setInterval(fetchViamData, 2000);
+        });
 
         return () => {
-            off(shipRef, 'value', handleShipUpdate);
-            off(tender3Ref, 'value', handleTender3Update);
-            off(tender4Ref, 'value', handleTender4Update);
+            isMounted = false;
+            if (interval) clearInterval(interval);
+            if (machine && machine.close) machine.close();
         };
     }, []);
 
@@ -113,6 +150,49 @@ const ShipMapRTDB = ({ pierLocation }) => {
             lastAnimatedPositionRef.current = shipPosition;
         }
     }, [shipPosition, mapCenter]);
+
+    const animateMarker = (to, duration = ANIMATION_DURATION) => {
+        const from = lastAnimatedPositionRef.current;
+        if (!from || !to || !shipMarkerRef.current) {
+            if (to) {
+                shipMarkerRef.current?.setLatLng(to);
+                lastAnimatedPositionRef.current = to;
+            }
+            return;
+        }
+
+        const marker = shipMarkerRef.current;
+        const start = performance.now();
+
+        function step(now) {
+            const elapsed = now - start;
+            const t = Math.min(elapsed / duration, 1);
+            const lat = from[0] + (to[0] - from[0]) * t;
+            const lng = from[1] + (to[1] - from[1]) * t;
+            const newLatLng = [lat, lng];
+            marker.setLatLng(newLatLng);
+            lastAnimatedPositionRef.current = newLatLng;
+
+            if (t < 1) {
+                animationRef.current = requestAnimationFrame(step);
+            }
+        }
+
+        if (animationRef.current) cancelAnimationFrame(animationRef.current);
+        animationRef.current = requestAnimationFrame(step);
+    };
+
+    useEffect(() => {
+        if (shipPosition) {
+            animateMarker(shipPosition);
+        }
+
+        return () => {
+            if (animationRef.current) cancelAnimationFrame(animationRef.current);
+        };
+    }, [shipPosition]);
+
+
 
     if (!mapCenter || !shipPosition) {
         return (
@@ -134,7 +214,7 @@ const ShipMapRTDB = ({ pierLocation }) => {
                     <line x1="2" y1="12" x2="6" y2="12" stroke="#fff" strokeWidth="2" />
                     <line x1="18" y1="12" x2="22" y2="12" strokeWidth="2" />
                 </svg>
-                <span>Evrima</span>
+                <span>Luminara</span>
             </button>
         );
     }
@@ -178,12 +258,12 @@ const ShipMapRTDB = ({ pierLocation }) => {
                 position={shipPosition}
                 icon={shipIcon}
                 rotationAngle={shipHeading - 90}
-                rotationOrigin="60px 8.5px" // <-- Adjusted to match the icon anchor
+                rotationOrigin="center"
                 ref={shipMarkerRef}
                 zIndexOffset={100}
             >
                 <Popup className="custom-popup">
-                    Evrima<br />
+                    Luminara<br />
                     {shipLastReceived && (
                         <span style={{ fontSize: '0.7em', color: '#aaa' }}>
                             LAST RECEIVED: {shipLastReceived.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
@@ -194,7 +274,6 @@ const ShipMapRTDB = ({ pierLocation }) => {
 
             {/* {tender3Position && (
                 <Marker
-                    key={tender3Heading}
                     position={tender3Position}
                     icon={tenderIcon}
                     rotationAngle={tender3Heading - 90}
@@ -207,26 +286,6 @@ const ShipMapRTDB = ({ pierLocation }) => {
                         {tender3LastReceived && (
                             <span style={{ fontSize: '0.7em', color: '#aaa' }}>
                                 LAST RECEIVED: {tender3LastReceived.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
-                            </span>
-                        )}
-                    </Popup>
-                </Marker>
-            )}
-            {tender4Position && (
-                <Marker
-                    key={tender4Heading}
-                    position={tender4Position}
-                    icon={tenderIcon}
-                    rotationAngle={tender4Heading - 90}
-                    rotationOrigin="center"
-                    ref={tender4MarkerRef}
-                    zIndexOffset={1002}
-                >
-                    <Popup className="custom-popup">
-                        Tender 4<br />
-                        {tender4LastReceived && (
-                            <span style={{ fontSize: '0.7em', color: '#aaa' }}>
-                                LAST RECEIVED: {tender4LastReceived.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                             </span>
                         )}
                     </Popup>
@@ -246,8 +305,8 @@ const ShipMapRTDB = ({ pierLocation }) => {
             {tender3Position && (
                 <PredictedMovingMarker
                     position={tender3Position}
-                    sog={tender3Speed}
-                    cog={tender3Heading}
+                    sog={tender3SOG}
+                    cog={tender3COG}
                     lastReceived={tender3LastReceived}
                     icon={tenderIcon}
                     zIndexOffset={1001}
@@ -260,8 +319,8 @@ const ShipMapRTDB = ({ pierLocation }) => {
             {tender4Position && (
                 <PredictedMovingMarker
                     position={tender4Position}
-                    sog={tender4Speed}
-                    cog={tender4Heading}
+                    sog={tender4SOG}
+                    cog={tender4COG}
                     lastReceived={tender4LastReceived}
                     icon={tenderIcon}
                     zIndexOffset={2002}
@@ -271,15 +330,6 @@ const ShipMapRTDB = ({ pierLocation }) => {
                     pierLocation={pierLocation}
                 />
             )}
-
-            {/* {shipPosition && (
-                <Marker
-                    position={shipPosition}
-                    icon={shipDotIcon}
-                    zIndexOffset={9999}
-                    interactive={false}
-                />
-            )} */}
 
             <LogZoom />
         </MapContainer>
@@ -302,4 +352,4 @@ const LogZoom = () => {
     return null;
 };
 
-export default ShipMapRTDB;
+export default ShipMap;

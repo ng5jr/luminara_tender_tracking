@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { db } from "../../firebaseconfig";
+import { db } from "../../firebaseconfig.js";
 import { collection, query, orderBy, onSnapshot, doc, limit, where } from "firebase/firestore";
 import notificationSound from "../../assets/notification.mp3";
 

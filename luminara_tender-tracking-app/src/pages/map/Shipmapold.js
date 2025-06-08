@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import boat from '../../assets/shipimg.png';
 import Location from "../../assets/position.png";
-import tender3IconImg from '../../assets/evrimatender.png';
+import tender3IconImg from '../../assets/Luminaratender.png';
 import 'leaflet-rotatedmarker'
 import 'leaflet/dist/leaflet.css';
 import * as VIAM from '@viamrobotics/sdk';
@@ -158,7 +158,7 @@ const ShipMap = ({ pierLocation }) => {
                     <line x1="2" y1="12" x2="6" y2="12" stroke="#fff" strokeWidth="2" />
                     <line x1="18" y1="12" x2="22" y2="12" stroke="#fff" strokeWidth="2" />
                 </svg>
-                <span>Evrima</span>
+                <span>Luminara</span>
             </button>
         );
     }
@@ -206,7 +206,7 @@ const ShipMap = ({ pierLocation }) => {
                 rotationOrigin="center"
             >
                 <Popup className="custom-popup">
-                    Evrima<br />
+                    Luminara<br />
                     {shipLastReceived && (
                         <span style={{ fontSize: '0.7em', color: '#aaa' }}>
                             LAST RECEIVED: {shipLastReceived.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
