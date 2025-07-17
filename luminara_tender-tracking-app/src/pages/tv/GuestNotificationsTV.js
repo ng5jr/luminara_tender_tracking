@@ -245,29 +245,40 @@ function GuestNotificationsTV() {
                     style={{ display: "none" }}
                 />
                 <ul className="notification-list">
-                    {notifications.map((notification) => (
-                        <li
-                            key={notification.id}
-                            className={`notification-item ${notification.direction === "SHORESIDE"
-                                ? "shoreside-notification"
-                                : notification.direction === "SHIPSIDE"
-                                    ? "shipside-notification"
-                                    : "custom-notification"
-                                } ${notification.id === latestNotificationId
-                                    ? "blinking-notification"
-                                    : ""
-                                }`}
-                        >
-                            <p className="notification-message">{notification.message}</p>
-                            <p className="notification-time">
-                                {notification.timestamp?.toDate()?.toLocaleString(undefined, {
-                                    hour: "numeric",
-                                    minute: "numeric",
-                                    hour12: true,
-                                })}
-                            </p>
-                        </li>
-                    ))}
+                    {notifications.map((notification) => {
+                        let displayTime = "";
+                        if (notification.timestamp) {
+                            const dateObj = typeof notification.timestamp.toDate === "function"
+                                ? notification.timestamp.toDate()
+                                : new Date(notification.timestamp);
+                            displayTime = !isNaN(dateObj)
+                                ? dateObj.toLocaleString(undefined, {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    hour12: false,
+                                })
+                                : "";
+                        }
+                        return (
+                            <li
+                                key={notification.id}
+                                className={`notification-item ${notification.direction === "SHORESIDE"
+                                    ? "shoreside-notification"
+                                    : notification.direction === "SHIPSIDE"
+                                        ? "shipside-notification"
+                                        : "custom-notification"
+                                    } ${notification.id === latestNotificationId
+                                        ? "blinking-notification"
+                                        : ""
+                                    }`}
+                            >
+                                <p className="notification-message">{notification.message}</p>
+                                <p className="notification-time">
+                                    {displayTime}
+                                </p>
+                            </li>
+                        );
+                    })}
                 </ul>
             </div>
         </div>
