@@ -51,11 +51,21 @@ const ShipMapRTDB = ({ pierLocation }) => {
     const [tender4Heading, setTender4Heading] = useState(0);
     const [tender4Speed, setTender4Speed] = useState(0);
     const [tender4LastReceived, setTender4LastReceived] = useState(null);
+    const [tender5Position, setTender5Position] = useState(null);
+    const [tender5Heading, setTender5Heading] = useState(0);
+    const [tender5Speed, setTender5Speed] = useState(0);
+    const [tender5LastReceived, setTender5LastReceived] = useState(null);
+    const [tender6Position, setTender6Position] = useState(null);
+    const [tender6Heading, setTender6Heading] = useState(0);
+    const [tender6Speed, setTender6Speed] = useState(0);
+    const [tender6LastReceived, setTender6LastReceived] = useState(null);
     const [showToast, setShowToast] = useState(false);
 
     const shipMarkerRef = useRef(null);
     const tender3MarkerRef = useRef(null);
     const tender4MarkerRef = useRef(null);
+    const tender5MarkerRef = useRef(null);
+    const tender6MarkerRef = useRef(null);
     // const animationRef = useRef();
     const lastAnimatedPositionRef = useRef(null);
 
@@ -63,9 +73,11 @@ const ShipMapRTDB = ({ pierLocation }) => {
 
     useEffect(() => {
         const db = rtdb;
-        const shipRef = ref(db, 'positions/ship/latest');
-        const tender3Ref = ref(db, 'positions/tender3/latest');
-        const tender4Ref = ref(db, 'positions/tender4/latest');
+        const shipRef = ref(db, 'ship/latest');
+        const tender3Ref = ref(db, 'tender3/latest');
+        const tender4Ref = ref(db, 'tender4/latest');
+        const tender5Ref = ref(db, 'tender5/latest');
+        const tender6Ref = ref(db, 'tender6/latest');
 
         const handleShipUpdate = (snapshot) => {
             const data = snapshot.val();
@@ -96,15 +108,39 @@ const ShipMapRTDB = ({ pierLocation }) => {
                 console.log('Tender 4 position:', [data.lat, data.lon], 'Tender 4 Heading:', data.heading, 'Tender 4 Speed:', data.speed);
             }
         };
+        const handleTender5Update = (snapshot) => {
+            const data = snapshot.val();
+            if (data && data.lat && data.lon) {
+                setTender5Position([data.lat, data.lon]);
+                setTender5Heading(data.heading || 0);
+                setTender5Speed(data.speed || 0);
+                setTender5LastReceived(new Date(data.timestamp));
+                console.log('Tender 5 position:', [data.lat, data.lon], 'Tender 5 Heading:', data.heading, 'Tender 5 Speed:', data.speed);
+            }
+        };
+        const handleTender6Update = (snapshot) => {
+            const data = snapshot.val();
+            if (data && data.lat && data.lon) {
+                setTender6Position([data.lat, data.lon]);
+                setTender6Heading(data.heading || 0);
+                setTender6Speed(data.speed || 0);
+                setTender6LastReceived(new Date(data.timestamp));
+                console.log('Tender 6 position:', [data.lat, data.lon], 'Tender 6 Heading:', data.heading, 'Tender 6 Speed:', data.speed);
+            }
+        };
 
         onValue(shipRef, handleShipUpdate);
         onValue(tender3Ref, handleTender3Update);
         onValue(tender4Ref, handleTender4Update);
+        onValue(tender5Ref, handleTender5Update);
+        onValue(tender6Ref, handleTender6Update);
 
         return () => {
             off(shipRef, 'value', handleShipUpdate);
             off(tender3Ref, 'value', handleTender3Update);
             off(tender4Ref, 'value', handleTender4Update);
+            off(tender5Ref, 'value', handleTender5Update);
+            off(tender6Ref, 'value', handleTender6Update);
         };
     }, []);
 
@@ -182,8 +218,8 @@ const ShipMapRTDB = ({ pierLocation }) => {
                 style={{ height: '100%', width: '100%' }}
             >
                 <TileLayer
-                    url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.jpg??api_key=b86c5acf-0c86-4560-b72f-5657b6b741e5"
-                    attribution='&copy; CNES, Airbus DS, PlanetObserver, Copernicus | &copy; <a href="https://www.stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
                 <Marker
                     key={shipHeading} // <-- Add this line
@@ -303,6 +339,35 @@ const ShipMapRTDB = ({ pierLocation }) => {
                         pierLocation={pierLocation}
                     />
                 )}
+                {pierLocation && tender5Position && (
+                    <PredictedMovingMarker
+                        position={tender5Position}
+                        sog={tender5Speed}
+                        cog={tender5Heading}
+                        lastReceived={tender5LastReceived}
+                        icon={tenderIcon}
+                        zIndexOffset={2002}
+                        name="Tender 5"
+                        markerRef={tender5MarkerRef}
+                        shipPosition={shipPosition}
+                        pierLocation={pierLocation}
+                    />
+                )}
+                {pierLocation && tender6Position && (
+                    <PredictedMovingMarker
+                        position={tender6Position}
+                        sog={tender6Speed}
+                        cog={tender6Heading}
+                        lastReceived={tender6LastReceived}
+                        icon={tenderIcon}
+                        zIndexOffset={2002}
+                        name="Tender 6"
+                        markerRef={tender6MarkerRef}
+                        shipPosition={shipPosition}
+                        pierLocation={pierLocation}
+                    />
+                )}
+
 
                 {/* {shipPosition && (
                     <Marker
