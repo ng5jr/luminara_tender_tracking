@@ -45,6 +45,13 @@ function Rating() {
         timestamp: serverTimestamp(),
       });
 
+      // Persist that feedback is completed so we don't prompt again in the future
+      try {
+        localStorage.setItem("feedbackCompleted", "true");
+      } catch (_) {
+        // ignore storage errors (e.g., disabled cookies)
+      }
+
       setWebsiteRating(0);
       setTenderRating(0);
       setComments("");
