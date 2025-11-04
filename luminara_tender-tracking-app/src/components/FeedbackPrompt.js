@@ -122,6 +122,10 @@ export default function FeedbackPrompt() {
         setVisible(false);
     };
 
+    const closeOnly = () => {
+        setVisible(false); // Close without snooze
+    };
+
     return (
         <div className="feedback-toast" role="dialog" aria-live="polite" aria-label="Feedback prompt">
             <div className="feedback-toast__content">
@@ -136,7 +140,7 @@ export default function FeedbackPrompt() {
                     Not now
                 </button>
             </div>
-            <button className="feedback-toast__close" onClick={dismiss} aria-label="Close">
+            <button className="feedback-toast__close" onClick={closeOnly} aria-label="Close">
                 ×
             </button>
         </div>
