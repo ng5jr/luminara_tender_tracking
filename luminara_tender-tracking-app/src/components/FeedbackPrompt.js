@@ -37,7 +37,7 @@ const shouldSuppress = (pathname) => {
 const randomDelayMs = () => {
     // Between 30s and 120s
     const min = 30_000;
-    const max = 120_000;
+    const max = 90_000;
     return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
