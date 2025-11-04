@@ -1,26 +1,37 @@
+/* Theme variables for Ritz-Carlton palette */
+:root {
+    --rc-black: #000000;
+    --rc-white: #ffffff;
+    /* Update this to the exact brand hex if needed */
+    --rc-memorable-blue: #003e5c;
+    --rc-border: rgba(255, 255, 255, 0.18);
+    --rc-text-muted: rgba(255, 255, 255, 0.78);
+}
+
 /* Minimal, non-intrusive toast-style popup */
 .feedback-toast {
     position: fixed;
-    right: 16px;
-    bottom: 16px;
-    max-width: 320px;
-    background: #0f172a;
-    /* slate-900 */
-    color: #e2e8f0;
-    /* slate-200 */
-    border: 1px solid rgba(148, 163, 184, 0.3);
-    /* slate-400 alpha */
-    border-radius: 12px;
-    padding: 12px 14px 12px 14px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    left: 50%;
+    right: auto;
+    bottom: 24px;
+    transform: translateX(-50%);
+    width: calc(100% - 75px);
+    max-width: 420px;
+    background: var(--rc-black);
+    color: var(--rc-white);
+    border: 1px solid var(--rc-border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
     display: grid;
     grid-template-columns: 1fr auto;
     grid-template-areas:
         "content close"
         "actions actions";
-    gap: 10px 8px;
+    gap: 12px 8px;
     z-index: 9999;
-    animation: feedback-toast-in 240ms ease-out;
+    animation: feedback-toast-in 220ms ease-out;
 }
 
 @keyframes feedback-toast-in {
@@ -49,57 +60,56 @@
     grid-area: close;
     background: transparent;
     border: none;
-    color: #94a3b8;
-    font-size: 18px;
+    color: var(--rc-text-muted);
+    font-size: 20px;
     cursor: pointer;
+    height: 10px;
 }
 
 .feedback-toast__close:hover {
-    color: #cbd5e1;
+    color: var(--rc-white);
 }
 
 .feedback-toast__title {
     font-weight: 600;
     margin-bottom: 4px;
-    color: #f8fafc;
+    color: var(--rc-white);
 }
 
 .feedback-toast__text {
     font-size: 0.92rem;
     line-height: 1.35;
-    color: #cbd5e1;
+    color: var(--rc-text-muted);
 }
 
 .feedback-btn {
     appearance: none;
-    border: 1px solid rgba(148, 163, 184, 0.35);
+    border: 1px solid var(--rc-border);
     background: transparent;
-    color: #e2e8f0;
+    color: var(--rc-white);
     padding: 6px 10px;
-    border-radius: 8px;
+    border-radius: 10px;
     font-weight: 500;
     cursor: pointer;
 }
 
 .feedback-btn:hover {
-    background: rgba(148, 163, 184, 0.12);
+    background: rgba(255, 255, 255, 0.09);
 }
 
 .feedback-btn--primary {
     border: none;
-    background: #0891b2;
-    /* cyan-700 */
-    color: white;
+    background: var(--rc-memorable-blue);
+    color: var(--rc-white);
 }
 
 .feedback-btn--primary:hover {
-    background: #0ea5b9;
+    filter: brightness(1.08);
 }
 
-@media (max-width: 480px) {
+/* Hide on non-phone sizes */
+@media (min-width: 601px) {
     .feedback-toast {
-        left: 12px;
-        right: 12px;
-        bottom: 12px;
+        display: none !important;
     }
 }

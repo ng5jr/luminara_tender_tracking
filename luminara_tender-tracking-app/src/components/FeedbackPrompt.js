@@ -49,7 +49,31 @@ export default function FeedbackPrompt() {
     const [hasTriggered, setHasTriggered] = useState(false);
     const timeoutRef = useRef(null);
 
-    const suppressed = useMemo(() => shouldSuppress(location.pathname), [location.pathname]);
+    // Mobile-only visibility
+    const [isMobile, setIsMobile] = useState(() => {
+        if (typeof window === "undefined" || typeof window.matchMedia !== "function") return true;
+        return window.matchMedia("(max-width: 600px)").matches;
+    });
+
+    useEffect(() => {
+        if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
+        const mq = window.matchMedia("(max-width: 600px)");
+        const handler = (e) => setIsMobile(e.matches);
+        // set initial in case of hydration differences
+        setIsMobile(mq.matches);
+        mq.addEventListener?.("change", handler);
+        // Fallback for older browsers
+        if (!mq.addEventListener && mq.addListener) mq.addListener(handler);
+        return () => {
+            mq.removeEventListener?.("change", handler);
+            if (!mq.removeEventListener && mq.removeListener) mq.removeListener(handler);
+        };
+    }, []);
+
+    const suppressed = useMemo(() => {
+        // Also suppress when not on a phone-size screen
+        return shouldSuppress(location.pathname) || !isMobile;
+    }, [location.pathname, isMobile]);
 
     useEffect(() => {
         // If route changes, hide prompt if we're on pages where it's suppressed
