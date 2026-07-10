@@ -31,12 +31,6 @@ const tenderIcon = L.icon({
     popupAnchor: [0, -7],
 });
 
-const shipDotIcon = L.divIcon({
-    className: 'ship-dot-icon',
-    html: '<div style="width:4px;height:4px;background:#ff3333;border:2px solid #fff;border-radius:50%;box-shadow:0 0 6px #000a;"></div>',
-    iconSize: [12, 12],
-    iconAnchor: [6, 6],
-});
 
 const ShipMapRTDB = ({ pierLocation }) => {
     const [mapCenter, setMapCenter] = useState(null);
