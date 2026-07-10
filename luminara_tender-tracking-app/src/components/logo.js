@@ -1,22 +1,19 @@
 import React from "react";
 import "./logo.css"; // Assuming you have a CSS file for styling
-import logoImage from "../assets/RCYC_PRIMARY_CMYK .jpg"; // Adjust the path as necessary
-import { Link } from "react-router-dom";
-import rating from "../assets/rating.png"; // Adjust the path as necessary
-import volume from "../assets/volume.png"; // Adjust the path as necessary
-import mute from "../assets/mute.png"; // Adjust the path as necessary
-import { FaVolumeMute } from "react-icons/fa";
-import { FaVolumeUp } from "react-icons/fa";
-import { MdOutlineNotificationsActive } from "react-icons/md";
-import { FaMapLocationDot } from "react-icons/fa6";
-import { SlLike } from "react-icons/sl";
+import { Link, NavLink, useLocation } from "react-router-dom";
 
 const Logo = ({ page, enableSound, soundEnabled, tv }) => {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const isEmbed = params.get("embed") === "true";
+  const embedSearch = isEmbed ? "?embed=true" : "";
+
   if (tv === "tv") {
     return (
-      <header>
-        <Link to="/">
-          <div className="logo">
+      <header className={isEmbed ? "embed-header" : ""}>
+        {!isEmbed ? (
+          <Link to={`/${embedSearch}`}>
+            <div className="logo">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="175"
@@ -151,12 +148,14 @@ const Logo = ({ page, enableSound, soundEnabled, tv }) => {
             </svg>
           </div>
         </Link>
+        ) : null}
       </header>
     );
   } else {
     return (
-      <header>
-        <Link to="/">
+      <header className={isEmbed ? "embed-header" : ""}>
+        {!isEmbed ? (
+        <Link to={`/${embedSearch}`}>
           <div className="logo">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -292,34 +291,43 @@ const Logo = ({ page, enableSound, soundEnabled, tv }) => {
             </svg>
           </div>
         </Link>
+        ) : null}
         {/* <Link to="/feedback">
         <div className="feedback-icon-container">
           <img src={rating} alt="View Tender Map" className="rating-icon" />
         </div>
       </Link> */}
         <nav className="links">
-          <Link className="header-link" to="/">
+          <NavLink
+            className={({ isActive }) =>
+              `header-link ${isActive ? "header-link-active" : ""}`
+            }
+            to={`/${embedSearch}`}
+            end
+          >
             <span>Notifications</span>
-
-          </Link>
+          </NavLink>
           {/* <Link className="header-link" to="/map">
             <span>Live Tracker</span> */}
           {/* <FaMapLocationDot /> */}
           {/* </Link> */}
-          <Link className="header-link" to="/feedback">
+          <NavLink
+            className={({ isActive }) =>
+              `header-link ${isActive ? "header-link-active" : ""}`
+            }
+            to={`/feedback${embedSearch}`}
+          >
             <span>Feedback</span>
             {/* <SlLike /> */}
-          </Link>
-          {page !== "no-sound" && (<div onClick={enableSound} className="volume">
+          </NavLink>
+          {/* {page !== "no-sound" && (<div onClick={enableSound} className="volume">
             {!soundEnabled ? (
               <FaVolumeMute />
             ) : (
               <FaVolumeUp />
             )}
-          </div>)}
-
+          </div>)} */}
         </nav>
-
       </header>
     );
   }

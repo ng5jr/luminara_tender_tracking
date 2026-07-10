@@ -1,67 +1,96 @@
 /* GuestNotifications.css - Mobile Only */
 body {
   box-sizing: border-box;
-  background-color: #1c1c1c;
-
+  background-color: #f5f5f5;
 }
 
 .guest-notifications {
   box-sizing: border-box;
-  margin: 10px auto;
-  padding: 35px 35px;
-  border: 1px solid white;
-  border-radius: 8px;
-  background-color: #1c1c1c;
-  color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  max-width: 800px;
+  margin: 0 auto;
+  /* padding: 35px 35px; */
+  border: none;
+  border-radius: 0px;
+  color: #1c1c1c;
+  max-width: 856px;
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 20px;
-  height: calc(100vh - 20px);
 
+  height: calc(100vh - 48px);
+  background-color: #ffffff;
+  margin: 24px auto;
+}
+
+.header-container {
+  margin: 0 72px;
+  padding: 64px 0px 40px 0px;
+}
+
+.reference-info {
+  margin: 0 72px 24px 72px;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+.reference-label {
+  font-family: Mulish, "Helvetica Neue", sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 13px;
+  letter-spacing: 0.39px;
+  color: #1c1c1c;
+  padding: 0 16px 0 0;
+  border-right: 1px solid rgba(28, 28, 28, 0.2);
+}
+
+.reference-label:last-child {
+  padding: 0;
+  border-right: none;
 }
 
 .guest-notifications h1 {
-  font-family: 'Big Caslon', 'Times New Roman', serif;
-  text-transform: uppercase;
-  text-align: center;
+  font-family: var(--app-font-display);
   font-weight: 400;
-  line-height: 1.1em;
-  letter-spacing: 0.05em;
-  color: white;
-  margin: 0;
-  font-size: 30px;
+  font-style: normal;
+  font-size: 42px;
+  line-height: 46.2px;
+  letter-spacing: 0.84px;
+  color: #1c1c1c;
+  margin: 0 0 32px 0;
 }
 
 .guest-notifications h2 {
-  font-family: 'Proxima Nova', 'Helvetica Neue', sans-serif;
-  text-transform: uppercase;
-  text-align: center;
-  font-weight: 200;
-  line-height: 1.2em;
-  letter-spacing: 0.05em;
-  color: white;
-  margin: 0;
-  font-size: 20px;
+  all: unset;
+  color: var(--Text-Neutral-Primary, #1c1c1c);
+
+  /* Headlines/Eyebrow */
+  font-family: var(--Typography-Headlines-Eyebrow-fontFamily, "Big Caslon CC");
+  font-size: var(--Typography-Headlines-Eyebrow-fontSize, 27px);
+  font-style: italic;
+  font-weight: 400;
+  line-height: var(
+    --Typography-Headlines-Eyebrow-lineHeight,
+    32.4px
+  ); /* 120% */
+  letter-spacing: var(--Typography-Headlines-Eyebrow-letterSpacing, 0.54px);
 }
 
 .guest-notifications h3 {
-  font-family: 'Proxima Nova', 'Helvetica Neue', sans-serif;
-  text-transform: uppercase;
-  text-align: center;
-  font-weight: 200;
-  line-height: 1.2em;
-  letter-spacing: 0.05em;
-  color: white;
+  font-family: Mulish, "Helvetica Neue", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 13px;
+  line-height: 13px;
+  letter-spacing: 0.39px;
+  color: #404040;
   margin: 0;
-  font-size: 15px;
 }
 
 .notification-list {
-
   list-style: none;
   padding: 0;
   margin: 0;
@@ -84,11 +113,49 @@ body {
 }
 
 .notification-item {
-  border-bottom: 1px solid #555;
-  padding: 10px;
-  /* Reduced padding */
-  transition: background-color 0.3s ease, text-align 0.3s ease;
+  border-bottom: 1px solid rgb(28, 28, 28, 0.2);
 
+  /* Reduced padding */
+  transition:
+    background-color 0.3s ease,
+    text-align 0.3s ease;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 72px;
+}
+
+.tender {
+  display: flex;
+  flex-direction: column;
+  padding-left: 24px;
+  height: 100%;
+  border-left: 1px solid rgb(28, 28, 28, 0.2);
+  font-family: Mulish, "Helvetica Neue", sans-serif;
+  font-weight: 400;
+  font-size: var(--Typography-Body-Disclaimer-fontSize, 14px);
+  line-height: 19.6px;
+  letter-spacing: 0.39px;
+  color: var(--Text-Neutral-Tertiary, #404040);
+  font-family: var(--Typography-Body-Disclaimer-fontFamily, Mulish);
+}
+
+.tender-number {
+  color: var(--Text-Neutral-Tertiary, #404040);
+  text-align: center;
+
+  /* Headlines/Eyebrow */
+  font-family: var(--Typography-Headlines-Eyebrow-fontFamily, "Big Caslon CC");
+  font-size: var(--Typography-Headlines-Eyebrow-fontSize, 27px);
+  font-style: italic;
+  font-weight: 400;
+  line-height: var(
+    --Typography-Headlines-Eyebrow-lineHeight,
+    32.4px
+  ); /* 120% */
+  letter-spacing: var(--Typography-Headlines-Eyebrow-letterSpacing, 0.54px);
 }
 
 .notification-item:last-child {
@@ -96,23 +163,55 @@ body {
 }
 
 .notification-message {
-  font-family: 'Proxima Nova', 'Helvetica Neue', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  color: var(--Text-Neutral-Primary, #1c1c1c);
+  text-overflow: ellipsis;
 
-  font-weight: 500;
-  font-size: 16px;
-  /* Smaller font size for mobile */
-  line-height: 1.6em;
+  /* Body/Default Regular */
+  font-family: var(--Typography-Body-Default-fontFamily, Mulish);
+  font-size: var(--Typography-Body-Default-fontSize, 16px);
+  font-style: normal;
+  font-weight: var(--Typography-Variant-Regular, 700);
+  line-height: var(--Typography-Body-Default-lineHeight, 24px); /* 150% */
+  letter-spacing: var(--Typography-Body-Default-letterSpacing, 0);
+  margin: 0;
+}
 
-  margin-bottom: 3px;
-  /* Reduced margin */
+.notification-icon {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  aspect-ratio: 1/1;
+}
+
+.notification-eta {
+  color: var(--Text-Neutral-Quaternary, #404040);
+
+  /* Body/Disclaimer */
+  font-family: var(--Typography-Body-Disclaimer-fontFamily, Mulish);
+  font-size: var(--Typography-Body-Disclaimer-fontSize, 14px);
+  font-style: normal;
+  font-weight: var(--Typography-Variant-Regular, 400);
+  line-height: var(--Typography-Body-Disclaimer-lineHeight, 19.6px); /* 140% */
+  letter-spacing: var(--Typography-Body-Disclaimer-letterSpacing, 0);
+  margin: 8px 0 0 0;
+  min-height: 19.594px;
 }
 
 .notification-time {
-  font-size: 14px;
-  /* Smaller font size for mobile */
-  font-family: 'Proxima Nova', 'Helvetica Neue', sans-serif;
+  color: var(--Text-Neutral-Tertiary, #404040);
 
-  opacity: 0.8;
+  /* Body/Disclaimer */
+  font-family: var(--Typography-Body-Disclaimer-fontFamily, Mulish);
+  font-size: var(--Typography-Body-Disclaimer-fontSize, 14px);
+  font-style: normal;
+  font-weight: var(--Typography-Variant-Regular, 400);
+  line-height: var(--Typography-Body-Disclaimer-lineHeight, 19.6px); /* 140% */
+  letter-spacing: var(--Typography-Body-Disclaimer-letterSpacing, 0);
+  margin: 0;
 }
 
 /* New Styles for Shoreside and Shipside */
@@ -120,15 +219,12 @@ body {
 .shoreside-notification {
   background-color: white;
   color: #1c1c1c;
-  text-align: center;
 }
 
 .shipside-notification {
-  background-color: #c7ddf3;
-  text-align: center;
+  background-color: #e8f1fa;
 
   color: #1c1c1c;
-
 }
 
 .custom-notification {
@@ -141,12 +237,41 @@ body {
   /* Blink 3 times */
 }
 
+.waiting-info {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.waiting-info h4 {
+  font-family: var(--app-font-display);
+  font-weight: 400;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 31.2px;
+  letter-spacing: 0.48px;
+  color: #404040;
+  margin: 0;
+}
+
+.waiting-info p {
+  font-family: Mulish, "Helvetica Neue", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0px;
+  color: #404040;
+  margin: 0;
+}
+
 @keyframes blinker {
   50% {
     opacity: 0;
   }
 }
-
 
 @keyframes pulse-animation {
   0% {
@@ -165,54 +290,142 @@ body {
   }
 }
 
-
-
 @media screen and (max-width: 600px) {
+  .header-container {
+    margin: 0 0;
+    padding: 24px 24px 40px 24px;
+  }
+
   .guest-notifications {
-    padding: 20px 15px;
+    padding: 0;
     /* Further reduced padding for mobile */
-    margin: 10px;
+    margin: 0;
     /* Further reduced margin for mobile */
-    height: calc(100vh - 20px);
+    height: calc(100vh);
   }
 
   .guest-notifications h1 {
-    line-height: 1.1em;
-    letter-spacing: 0.05em;
-    font-size: 25px;
+    color: var(--Text-Neutral-Primary, #1c1c1c);
+
+    /* Headlines/Heading 1 CAPS */
+    font-family: var(
+      --Typography-Headlines-Heading-1-CAPS-fontFamily,
+      "Big Caslon CC"
+    );
+    font-size: var(--Typography-Headlines-Heading-1-CAPS-fontSize, 31px);
+    font-style: normal;
+    font-weight: var(--Typography-Variant-Regular, 400);
+    line-height: var(
+      --Typography-Headlines-Heading-1-CAPS-lineHeight,
+      37.2px
+    ); /* 120% */
+    letter-spacing: var(
+      --Typography-Headlines-Heading-1-CAPS-letterSpacing,
+      0.31px
+    );
+    text-transform: uppercase;
+    margin-bottom: 8px;
   }
 
   .guest-notifications h2 {
+    all: unset;
+    color: var(--Text-Neutral-Primary, #1c1c1c);
 
-    font-weight: 200;
-    line-height: 1.2em;
-    letter-spacing: 0.05em;
+    /* Headlines/Eyebrow */
+    font-family: var(
+      --Typography-Headlines-Eyebrow-fontFamily,
+      "Big Caslon CC"
+    );
+    color: var(--Text-Neutral-Primary, #1c1c1c);
 
-    font-size: 15px;
+    /* Headlines/Eyebrow */
+    font-family: var(
+      --Typography-Headlines-Eyebrow-fontFamily,
+      "Big Caslon CC"
+    );
+    font-size: var(--Typography-Headlines-Eyebrow-fontSize, 24px);
+    font-style: italic;
+    font-weight: 400;
+    line-height: var(
+      --Typography-Headlines-Eyebrow-lineHeight,
+      28.8px
+    ); /* 120% */
+    letter-spacing: var(--Typography-Headlines-Eyebrow-letterSpacing, 0.48px);
   }
 
-  .guest-notifications h2 {
+  .guest-notifications h3 {
+    color: var(--Text-Neutral-Quaternary, #404040);
 
-    font-weight: 200;
-    line-height: 1.2em;
-    letter-spacing: 0.05em;
+    /* Caption/Label */
+    font-family: var(--Typography-Caption-Label-fontFamily, Mulish);
+    font-size: var(--Typography-Caption-Label-fontSize, 13px);
+    font-style: normal;
+    font-weight: var(--Typography-Variant-Regular, 400);
+    line-height: var(--Typography-Caption-Label-lineHeight, 13px); /* 100% */
+    letter-spacing: var(--Typography-Caption-Label-letterSpacing, 0.39px);
+  }
 
-    font-size: 10px;
+  .reference-info {
+    margin: 0 24px 24px 24px;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 8px;
   }
 
   .notification-item {
-    padding: 8px;
+    padding: var(--Padding-lg, 16px) 24px;
+
     /* Further reduced padding */
   }
 
   .notification-message {
-    font-size: 12px;
+    font-size: 16px;
     /* Further reduced font size for mobile */
   }
 
+  .notification-eta {
+    font-size: 14px;
+  }
+
   .notification-time {
-    font-size: 10px;
+    font-size: 14px;
     /* Further reduced font size for mobile */
+  }
+
+  .tender {
+    color: var(--Text-Neutral-Tertiary, #404040);
+    text-align: center;
+
+    /* Body/Disclaimer */
+    font-family: var(--Typography-Body-Disclaimer-fontFamily, Mulish);
+    font-size: var(--Typography-Body-Disclaimer-fontSize, 14px);
+    font-style: normal;
+    font-weight: var(--Typography-Variant-Regular, 400);
+    line-height: var(
+      --Typography-Body-Disclaimer-lineHeight,
+      19.6px
+    ); /* 140% */
+    letter-spacing: var(--Typography-Body-Disclaimer-letterSpacing, 0);
+  }
+  .tender-number {
+    color: var(--Text-Neutral-Tertiary, #404040);
+    text-align: center;
+
+    /* Headlines/Eyebrow */
+    font-family: var(
+      --Typography-Headlines-Eyebrow-fontFamily,
+      "Big Caslon CC"
+    );
+    font-size: var(--Typography-Headlines-Eyebrow-fontSize, 24px);
+    font-style: italic;
+    font-weight: 400;
+    line-height: var(
+      --Typography-Headlines-Eyebrow-lineHeight,
+      28.8px
+    ); /* 120% */
+    letter-spacing: var(--Typography-Headlines-Eyebrow-letterSpacing, 0.48px);
   }
 
   .feedback-icon-container {
@@ -222,12 +435,8 @@ body {
     top: 20px;
     /* Adjusted position for mobile */
   }
-
-
 }
 
-
 .map-h2 {
-
   font-size: 15px !important;
 }
