@@ -50,7 +50,7 @@ const MyMap = () => {
     <div className="guest-notifications">
       <Logo page="no-sound" />
       <h1>TENDER TRACKING MAP</h1>
-      <h2 className='map-h2'>Interact with the tenders for Arrival Times</h2>
+      {/* <h2 className='map-h2'>Interact with the tenders for Arrival Times</h2> */}
 
       <div style={{ position: 'relative', height: '80vh', width: '100%' }}>
 

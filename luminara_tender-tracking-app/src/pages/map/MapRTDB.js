@@ -1,240 +1,330 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import L from 'leaflet';
-import boat from '../../assets/shipimg.png';
+import React, { useEffect, useState, useRef } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import L from "leaflet";
+import boat from "../../assets/shipimg.png";
 import Location from "../../assets/position.png";
-import tender3IconImg from '../../assets/Luminaratender.png';
-import 'leaflet-rotatedmarker';
-import 'leaflet/dist/leaflet.css';
-import { ref, onValue, off } from 'firebase/database';
-import { rtdb } from '../../firebaseconfig.js'; import './ShipMap.css';
-import PredictedMovingMarker from './PredictedMovingMarker.js';
+import tender3IconImg from "../../assets/Luminaratender.png";
+import zodiacIconImg from "../../assets/Luminarazodiac.png";
+import "leaflet-rotatedmarker";
+import "leaflet/dist/leaflet.css";
+import { ref, onValue, off } from "firebase/database";
+import { rtdb } from "../../firebaseconfig.js";
+import "./ShipMap.css";
+import PredictedMovingMarker from "./PredictedMovingMarker.js";
 
 const shipIcon = L.icon({
-    iconUrl: boat,
-    iconSize: [80, 17],
-    iconAnchor: [60, 8.5],
-    popupAnchor: [0, -9],
+  iconUrl: boat,
+  iconSize: [80, 17],
+  iconAnchor: [60, 8.5],
+  popupAnchor: [0, -9],
 });
 
 const locationIcon = L.icon({
-    iconUrl: Location,
-    iconSize: [24, 32],
-    iconAnchor: [12, 32], // <-- bottom center
-    popupAnchor: [0, -32],
+  iconUrl: Location,
+  iconSize: [24, 32],
+  iconAnchor: [12, 32], // <-- bottom center
+  popupAnchor: [0, -32],
 });
 
 const tenderIcon = L.icon({
-    iconUrl: tender3IconImg,
-    iconSize: [30, 15],
-    iconAnchor: [15, 7],
-    popupAnchor: [0, -7],
+  iconUrl: tender3IconImg,
+  iconSize: [30, 15],
+  iconAnchor: [15, 7],
+  popupAnchor: [0, -7],
 });
 
+const zodiacIcon = L.icon({
+  iconUrl: zodiacIconImg,
+  iconSize: [30, 25],
+  iconAnchor: [15, 7],
+  popupAnchor: [0, -7],
+});
 
 const ShipMapRTDB = ({ pierLocation }) => {
-    const [mapCenter, setMapCenter] = useState(null);
-    const [shipPosition, setShipPosition] = useState(null);
-    const [shipHeading, setShipHeading] = useState(0);
-    const [shipLastReceived, setShipLastReceived] = useState(null);
-    const [tender3Position, setTender3Position] = useState(null);
-    const [tender3Heading, setTender3Heading] = useState(0);
-    const [tender3Speed, setTender3Speed] = useState(0);
-    const [tender3LastReceived, setTender3LastReceived] = useState(null);
-    const [tender4Position, setTender4Position] = useState(null);
-    const [tender4Heading, setTender4Heading] = useState(0);
-    const [tender4Speed, setTender4Speed] = useState(0);
-    const [tender4LastReceived, setTender4LastReceived] = useState(null);
-    const [tender5Position, setTender5Position] = useState(null);
-    const [tender5Heading, setTender5Heading] = useState(0);
-    const [tender5Speed, setTender5Speed] = useState(0);
-    const [tender5LastReceived, setTender5LastReceived] = useState(null);
-    const [tender6Position, setTender6Position] = useState(null);
-    const [tender6Heading, setTender6Heading] = useState(0);
-    const [tender6Speed, setTender6Speed] = useState(0);
-    const [tender6LastReceived, setTender6LastReceived] = useState(null);
-    const [showToast, setShowToast] = useState(false);
+  const [mapCenter, setMapCenter] = useState(null);
+  const [shipPosition, setShipPosition] = useState(null);
+  const [shipHeading, setShipHeading] = useState(0);
+  const [shipLastReceived, setShipLastReceived] = useState(null);
+  const [tender3Position, setTender3Position] = useState(null);
+  const [tender3Heading, setTender3Heading] = useState(0);
+  const [tender3Speed, setTender3Speed] = useState(0);
+  const [tender3LastReceived, setTender3LastReceived] = useState(null);
+  const [tender4Position, setTender4Position] = useState(null);
+  const [tender4Heading, setTender4Heading] = useState(0);
+  const [tender4Speed, setTender4Speed] = useState(0);
+  const [tender4LastReceived, setTender4LastReceived] = useState(null);
+  const [tender5Position, setTender5Position] = useState(null);
+  const [tender5Heading, setTender5Heading] = useState(0);
+  const [tender5Speed, setTender5Speed] = useState(0);
+  const [tender5LastReceived, setTender5LastReceived] = useState(null);
+  const [tender6Position, setTender6Position] = useState(null);
+  const [tender6Heading, setTender6Heading] = useState(0);
+  const [tender6Speed, setTender6Speed] = useState(0);
+  const [tender6LastReceived, setTender6LastReceived] = useState(null);
+  const [zodiacs, setZodiacs] = useState({});
+  const [showToast, setShowToast] = useState(false);
 
-    const shipMarkerRef = useRef(null);
-    const tender3MarkerRef = useRef(null);
-    const tender4MarkerRef = useRef(null);
-    const tender5MarkerRef = useRef(null);
-    const tender6MarkerRef = useRef(null);
-    // const animationRef = useRef();
-    const lastAnimatedPositionRef = useRef(null);
+  const shipMarkerRef = useRef(null);
+  const tender3MarkerRef = useRef(null);
+  const tender4MarkerRef = useRef(null);
+  const tender5MarkerRef = useRef(null);
+  const tender6MarkerRef = useRef(null);
+  const zodiacMarkerRefs = useRef(
+    Array.from({ length: 5 }, () => ({ current: null })),
+  );
+  // const animationRef = useRef();
+  const lastAnimatedPositionRef = useRef(null);
 
-    // const ANIMATION_DURATION = 5000;
+  // const ANIMATION_DURATION = 5000;
 
-    useEffect(() => {
-        const db = rtdb;
-        const shipRef = ref(db, 'ship/latest');
-        const tender3Ref = ref(db, 'tender3/latest');
-        const tender4Ref = ref(db, 'tender4/latest');
-        const tender5Ref = ref(db, 'tender5/latest');
-        const tender6Ref = ref(db, 'tender6/latest');
+  useEffect(() => {
+    const db = rtdb;
+    const shipRef = ref(db, "ship/latest");
+    const tender3Ref = ref(db, "tender3/latest");
+    const tender4Ref = ref(db, "tender4/latest");
+    const tender5Ref = ref(db, "tender5/latest");
+    const tender6Ref = ref(db, "tender6/latest");
+    const zodiacRefs = Array.from({ length: 5 }, (_, index) =>
+      ref(db, `zodiac_${index + 1}/latest`),
+    );
 
-        const handleShipUpdate = (snapshot) => {
-            const data = snapshot.val();
-            if (data && data.lat && data.lon) {
-                setShipPosition([data.lat, data.lon]);
-                setShipHeading(data.heading || 0);
-                setShipLastReceived(new Date(data.timestamp));
-                console.log('RTDB Ship position:', [data.lat, data.lon], 'Ship Heading:', data.heading, 'Ship Speed:', data.speed, "Received at:", new Date().toLocaleTimeString());
-            }
-        };
-        const handleTender3Update = (snapshot) => {
-            const data = snapshot.val();
-            if (data && data.lat && data.lon) {
-                setTender3Position([data.lat, data.lon]);
-                setTender3Heading(data.heading || 0);
-                setTender3Speed(data.speed || 0);
-                setTender3LastReceived(new Date(data.timestamp));
-                console.log('Tender 3 position:', [data.lat, data.lon], 'Tender 3 Heading:', data.heading, 'Tender 3 Speed:', data.speed);
-            }
-        };
-        const handleTender4Update = (snapshot) => {
-            const data = snapshot.val();
-            if (data && data.lat && data.lon) {
-                setTender4Position([data.lat, data.lon]);
-                setTender4Heading(data.heading || 0);
-                setTender4Speed(data.speed || 0);
-                setTender4LastReceived(new Date(data.timestamp));
-                console.log('Tender 4 position:', [data.lat, data.lon], 'Tender 4 Heading:', data.heading, 'Tender 4 Speed:', data.speed);
-            }
-        };
-        const handleTender5Update = (snapshot) => {
-            const data = snapshot.val();
-            if (data && data.lat && data.lon) {
-                setTender5Position([data.lat, data.lon]);
-                setTender5Heading(data.heading || 0);
-                setTender5Speed(data.speed || 0);
-                setTender5LastReceived(new Date(data.timestamp));
-                console.log('Tender 5 position:', [data.lat, data.lon], 'Tender 5 Heading:', data.heading, 'Tender 5 Speed:', data.speed);
-            }
-        };
-        const handleTender6Update = (snapshot) => {
-            const data = snapshot.val();
-            if (data && data.lat && data.lon) {
-                setTender6Position([data.lat, data.lon]);
-                setTender6Heading(data.heading || 0);
-                setTender6Speed(data.speed || 0);
-                setTender6LastReceived(new Date(data.timestamp));
-                console.log('Tender 6 position:', [data.lat, data.lon], 'Tender 6 Heading:', data.heading, 'Tender 6 Speed:', data.speed);
-            }
-        };
-
-        onValue(shipRef, handleShipUpdate);
-        onValue(tender3Ref, handleTender3Update);
-        onValue(tender4Ref, handleTender4Update);
-        onValue(tender5Ref, handleTender5Update);
-        onValue(tender6Ref, handleTender6Update);
-
-        return () => {
-            off(shipRef, 'value', handleShipUpdate);
-            off(tender3Ref, 'value', handleTender3Update);
-            off(tender4Ref, 'value', handleTender4Update);
-            off(tender5Ref, 'value', handleTender5Update);
-            off(tender6Ref, 'value', handleTender6Update);
-        };
-    }, []);
-
-    useEffect(() => {
-        if (!mapCenter && shipPosition && Array.isArray(shipPosition)) {
-            setMapCenter(shipPosition);
-            lastAnimatedPositionRef.current = shipPosition;
-        }
-    }, [shipPosition, mapCenter]);
-
-    if (!mapCenter || !shipPosition) {
-        return (
-            <div className="loading-container">
-                <span className="loader"></span>
-            </div>
+    const handleShipUpdate = (snapshot) => {
+      const data = snapshot.val();
+      if (data && data.lat && data.lon) {
+        setShipPosition([data.lat, data.lon]);
+        setShipHeading(data.heading || 0);
+        setShipLastReceived(new Date(data.timestamp));
+        console.log(
+          "RTDB Ship position:",
+          [data.lat, data.lon],
+          "Ship Heading:",
+          data.heading,
+          "Ship Speed:",
+          data.speed,
+          "Received at:",
+          new Date().toLocaleTimeString(),
         );
-    }
-
-    function CenterMapButton({ position }) {
-        const map = useMap();
-        return (
-            <button className="center-map-btn" onClick={() => map.flyTo(position, map.getZoom(), { animate: true, duration: 1.5 })}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" stroke="#fff" strokeWidth="2" />
-                    <circle cx="12" cy="12" r="3" fill="#fff" />
-                    <line x1="12" y1="2" x2="12" y2="6" stroke="#fff" strokeWidth="2" />
-                    <line x1="12" y1="18" x2="12" y2="22" stroke="#fff" strokeWidth="2" />
-                    <line x1="2" y1="12" x2="6" y2="12" stroke="#fff" strokeWidth="2" />
-                    <line x1="18" y1="12" x2="22" y2="12" strokeWidth="2" />
-                </svg>
-                <span>Luminara</span>
-            </button>
+      }
+    };
+    const handleTender3Update = (snapshot) => {
+      const data = snapshot.val();
+      if (data && data.lat && data.lon) {
+        setTender3Position([data.lat, data.lon]);
+        setTender3Heading(data.heading || 0);
+        setTender3Speed(data.speed || 0);
+        setTender3LastReceived(new Date(data.timestamp));
+        console.log(
+          "Tender 3 position:",
+          [data.lat, data.lon],
+          "Tender 3 Heading:",
+          data.heading,
+          "Tender 3 Speed:",
+          data.speed,
         );
-    }
-
-    function CenterPierButton({ position }) {
-        const map = useMap();
-        return (
-            <button
-                className="center-map-btn pier-btn"
-                style={{ top: 60 }}
-                onClick={() => map.flyTo(position, 16, { animate: true, duration: 1.5 })}
-            >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" stroke="#fff" strokeWidth="2" />
-                    <circle cx="12" cy="12" r="3" fill="#fff" />
-                    <line x1="12" y1="2" x2="12" y2="6" stroke="#fff" strokeWidth="2" />
-                    <line x1="12" y1="18" x2="12" y2="22" stroke="#fff" strokeWidth="2" />
-                    <line x1="2" y1="12" x2="6" y2="12" stroke="#fff" strokeWidth="2" />
-                    <line x1="18" y1="12" x2="22" y2="12" strokeWidth="2" />
-                </svg>
-                <span>Pier</span>
-            </button>
+      }
+    };
+    const handleTender4Update = (snapshot) => {
+      const data = snapshot.val();
+      if (data && data.lat && data.lon) {
+        setTender4Position([data.lat, data.lon]);
+        setTender4Heading(data.heading || 0);
+        setTender4Speed(data.speed || 0);
+        setTender4LastReceived(new Date(data.timestamp));
+        console.log(
+          "Tender 4 position:",
+          [data.lat, data.lon],
+          "Tender 4 Heading:",
+          data.heading,
+          "Tender 4 Speed:",
+          data.speed,
         );
-    }
-
-    // Toast component
-    function Toast({ message }) {
-        return (
-            <div className='toast'>
-                {message}
-            </div>
+      }
+    };
+    const handleTender5Update = (snapshot) => {
+      const data = snapshot.val();
+      if (data && data.lat && data.lon) {
+        setTender5Position([data.lat, data.lon]);
+        setTender5Heading(data.heading || 0);
+        setTender5Speed(data.speed || 0);
+        setTender5LastReceived(new Date(data.timestamp));
+        console.log(
+          "Tender 5 position:",
+          [data.lat, data.lon],
+          "Tender 5 Heading:",
+          data.heading,
+          "Tender 5 Speed:",
+          data.speed,
         );
-    }
+      }
+    };
+    const handleTender6Update = (snapshot) => {
+      const data = snapshot.val();
+      if (data && data.lat && data.lon) {
+        setTender6Position([data.lat, data.lon]);
+        setTender6Heading(data.heading || 0);
+        setTender6Speed(data.speed || 0);
+        setTender6LastReceived(new Date(data.timestamp));
+        console.log(
+          "Tender 6 position:",
+          [data.lat, data.lon],
+          "Tender 6 Heading:",
+          data.heading,
+          "Tender 6 Speed:",
+          data.speed,
+        );
+      }
+    };
 
+    const zodiacHandlers = zodiacRefs.map((_, index) => (snapshot) => {
+      const data = snapshot.val();
+      const zodiacNumber = index + 1;
+
+      if (data && data.lat != null && data.lon != null) {
+        setZodiacs((current) => ({
+          ...current,
+          [zodiacNumber]: {
+            position: [data.lat, data.lon],
+            heading: data.heading || 0,
+            speed: data.speed || 0,
+            lastReceived: data.timestamp ? new Date(data.timestamp) : null,
+          },
+        }));
+      } else {
+        setZodiacs((current) => {
+          const next = { ...current };
+          delete next[zodiacNumber];
+          return next;
+        });
+      }
+    });
+
+    onValue(shipRef, handleShipUpdate);
+    onValue(tender3Ref, handleTender3Update);
+    onValue(tender4Ref, handleTender4Update);
+    onValue(tender5Ref, handleTender5Update);
+    onValue(tender6Ref, handleTender6Update);
+    zodiacRefs.forEach((zodiacRef, index) =>
+      onValue(zodiacRef, zodiacHandlers[index]),
+    );
+
+    return () => {
+      off(shipRef, "value", handleShipUpdate);
+      off(tender3Ref, "value", handleTender3Update);
+      off(tender4Ref, "value", handleTender4Update);
+      off(tender5Ref, "value", handleTender5Update);
+      off(tender6Ref, "value", handleTender6Update);
+      zodiacRefs.forEach((zodiacRef, index) =>
+        off(zodiacRef, "value", zodiacHandlers[index]),
+      );
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!mapCenter && shipPosition && Array.isArray(shipPosition)) {
+      setMapCenter(shipPosition);
+      lastAnimatedPositionRef.current = shipPosition;
+    }
+  }, [shipPosition, mapCenter]);
+
+  if (!mapCenter || !shipPosition) {
     return (
-        <>
-            {showToast && <Toast message="Coordinates copied." />}
-            <MapContainer
-                center={mapCenter}
-                zoom={16}
-                minZoom={14}
-                maxZoom={16.5}
-                scrollWheelZoom={true}
-                style={{ height: '100%', width: '100%' }}
-            >
-                <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                />
-                <Marker
-                    key={shipHeading} // <-- Add this line
-                    position={shipPosition}
-                    icon={shipIcon}
-                    rotationAngle={shipHeading - 90}
-                    rotationOrigin="60px 8.5px" // <-- Adjusted to match the icon anchor
-                    ref={shipMarkerRef}
-                    zIndexOffset={100}
-                >
-                    <Popup className="custom-popup">
-                        Luminara<br />
-                        {shipLastReceived && (
-                            <span style={{ fontSize: '0.7em', color: '#aaa' }}>
-                                LAST RECEIVED: {shipLastReceived.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
-                            </span>
-                        )}
-                    </Popup>
-                </Marker>
+      <div className="loading-container">
+        <span className="loader"></span>
+      </div>
+    );
+  }
 
-                {/* {tender3Position && (
+  function CenterMapButton({ position }) {
+    const map = useMap();
+    return (
+      <button
+        className="center-map-btn"
+        onClick={() =>
+          map.flyTo(position, map.getZoom(), { animate: true, duration: 1.5 })
+        }
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#fff" strokeWidth="2" />
+          <circle cx="12" cy="12" r="3" fill="#fff" />
+          <line x1="12" y1="2" x2="12" y2="6" stroke="#fff" strokeWidth="2" />
+          <line x1="12" y1="18" x2="12" y2="22" stroke="#fff" strokeWidth="2" />
+          <line x1="2" y1="12" x2="6" y2="12" stroke="#fff" strokeWidth="2" />
+          <line x1="18" y1="12" x2="22" y2="12" strokeWidth="2" />
+        </svg>
+        <span>Luminara</span>
+      </button>
+    );
+  }
+
+  function CenterPierButton({ position }) {
+    const map = useMap();
+    return (
+      <button
+        className="center-map-btn pier-btn"
+        style={{ top: 60 }}
+        onClick={() =>
+          map.flyTo(position, 16, { animate: true, duration: 1.5 })
+        }
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#fff" strokeWidth="2" />
+          <circle cx="12" cy="12" r="3" fill="#fff" />
+          <line x1="12" y1="2" x2="12" y2="6" stroke="#fff" strokeWidth="2" />
+          <line x1="12" y1="18" x2="12" y2="22" stroke="#fff" strokeWidth="2" />
+          <line x1="2" y1="12" x2="6" y2="12" stroke="#fff" strokeWidth="2" />
+          <line x1="18" y1="12" x2="22" y2="12" strokeWidth="2" />
+        </svg>
+        <span>Pier</span>
+      </button>
+    );
+  }
+
+  // Toast component
+  function Toast({ message }) {
+    return <div className="toast">{message}</div>;
+  }
+
+  return (
+    <>
+      {showToast && <Toast message="Coordinates copied." />}
+      <MapContainer
+        center={mapCenter}
+        zoom={16}
+        minZoom={14}
+        maxZoom={16.5}
+        scrollWheelZoom={true}
+        style={{ height: "100%", width: "100%" }}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        <Marker
+          key={shipHeading} // <-- Add this line
+          position={shipPosition}
+          icon={shipIcon}
+          rotationAngle={shipHeading - 90}
+          rotationOrigin="60px 8.5px" // <-- Adjusted to match the icon anchor
+          ref={shipMarkerRef}
+          zIndexOffset={100}
+        >
+          <Popup className="custom-popup">
+            Luminara
+            <br />
+            {shipLastReceived && (
+              <span style={{ fontSize: "0.7em", color: "#aaa" }}>
+                LAST RECEIVED:{" "}
+                {shipLastReceived.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                })}
+              </span>
+            )}
+          </Popup>
+        </Marker>
+
+        {/* {tender3Position && (
                     <Marker
                         key={tender3Heading}
                         position={tender3Position}
@@ -275,95 +365,129 @@ const ShipMapRTDB = ({ pierLocation }) => {
                     </Marker>
                 )} */}
 
-                {pierLocation && (
-                    <Marker position={pierLocation} icon={locationIcon} rotationAngle={0} rotationOrigin="center">
-                        <Popup className="custom-popup">
-                            <div className='pier-popup'>
-                                <strong>Pier Location</strong>
-                                <span className='pier-popup-span'>
-                                    Lat: {pierLocation[0].toFixed(2)} <br /> Long: {pierLocation[1].toFixed(2)}
-                                    <button className='copy-coordinates-btn'
-                                        onClick={() => {
-                                            navigator.clipboard.writeText(
-                                                `${pierLocation[0].toFixed(6)}, ${pierLocation[1].toFixed(6)}`
-                                            );
-                                            setShowToast(true);
-                                            setTimeout(() => setShowToast(false), 1800);
-                                        }}
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="800px" height="800px" viewBox="0 0 24 24" fill="none">
-                                            <path d="M7.5 3H14.6C16.8402 3 17.9603 3 18.816 3.43597C19.5686 3.81947 20.1805 4.43139 20.564 5.18404C21 6.03969 21 7.15979 21 9.4V16.5M6.2 21H14.3C15.4201 21 15.9802 21 16.408 20.782C16.7843 20.5903 17.0903 20.2843 17.282 19.908C17.5 19.4802 17.5 18.9201 17.5 17.8V9.7C17.5 8.57989 17.5 8.01984 17.282 7.59202C17.0903 7.21569 16.7843 6.90973 16.408 6.71799C15.9802 6.5 15.4201 6.5 14.3 6.5H6.2C5.0799 6.5 4.51984 6.5 4.09202 6.71799C3.71569 6.90973 3.40973 7.21569 3.21799 7.59202C3 8.01984 3 8.57989 3 9.7V17.8C3 18.9201 3 19.4802 3.21799 19.908C3.40973 20.2843 3.71569 20.5903 4.09202 20.782C4.51984 21 5.0799 21 6.2 21Z" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
-                                    </button>
-                                </span>
-                            </div>
-                        </Popup>
-                    </Marker>
-                )}
+        {pierLocation && (
+          <Marker
+            position={pierLocation}
+            icon={locationIcon}
+            rotationAngle={0}
+            rotationOrigin="center"
+          >
+            <Popup className="custom-popup">
+              <div className="pier-popup">
+                <strong>Pier Location</strong>
+                <span className="pier-popup-span">
+                  Lat: {pierLocation[0].toFixed(2)} <br /> Long:{" "}
+                  {pierLocation[1].toFixed(2)}
+                  <button
+                    className="copy-coordinates-btn"
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        `${pierLocation[0].toFixed(6)}, ${pierLocation[1].toFixed(6)}`,
+                      );
+                      setShowToast(true);
+                      setTimeout(() => setShowToast(false), 1800);
+                    }}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="800px"
+                      height="800px"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <path
+                        d="M7.5 3H14.6C16.8402 3 17.9603 3 18.816 3.43597C19.5686 3.81947 20.1805 4.43139 20.564 5.18404C21 6.03969 21 7.15979 21 9.4V16.5M6.2 21H14.3C15.4201 21 15.9802 21 16.408 20.782C16.7843 20.5903 17.0903 20.2843 17.282 19.908C17.5 19.4802 17.5 18.9201 17.5 17.8V9.7C17.5 8.57989 17.5 8.01984 17.282 7.59202C17.0903 7.21569 16.7843 6.90973 16.408 6.71799C15.9802 6.5 15.4201 6.5 14.3 6.5H6.2C5.0799 6.5 4.51984 6.5 4.09202 6.71799C3.71569 6.90973 3.40973 7.21569 3.21799 7.59202C3 8.01984 3 8.57989 3 9.7V17.8C3 18.9201 3 19.4802 3.21799 19.908C3.40973 20.2843 3.71569 20.5903 4.09202 20.782C4.51984 21 5.0799 21 6.2 21Z"
+                        stroke="#000000"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                </span>
+              </div>
+            </Popup>
+          </Marker>
+        )}
 
-                {shipPosition && <CenterMapButton position={shipPosition} />}
-                {pierLocation && <CenterPierButton position={pierLocation} />}
+        {shipPosition && <CenterMapButton position={shipPosition} />}
+        {pierLocation && <CenterPierButton position={pierLocation} />}
 
+        {pierLocation && tender3Position && (
+          <PredictedMovingMarker
+            position={tender3Position}
+            sog={tender3Speed}
+            cog={tender3Heading}
+            lastReceived={tender3LastReceived}
+            icon={tenderIcon}
+            zIndexOffset={1001}
+            name="Tender 3"
+            markerRef={tender3MarkerRef}
+            shipPosition={shipPosition}
+            pierLocation={pierLocation}
+          />
+        )}
+        {pierLocation && tender4Position && (
+          <PredictedMovingMarker
+            position={tender4Position}
+            sog={tender4Speed}
+            cog={tender4Heading}
+            lastReceived={tender4LastReceived}
+            icon={tenderIcon}
+            zIndexOffset={2002}
+            name="Tender 4"
+            markerRef={tender4MarkerRef}
+            shipPosition={shipPosition}
+            pierLocation={pierLocation}
+          />
+        )}
+        {pierLocation && tender5Position && (
+          <PredictedMovingMarker
+            position={tender5Position}
+            sog={tender5Speed}
+            cog={tender5Heading}
+            lastReceived={tender5LastReceived}
+            icon={tenderIcon}
+            zIndexOffset={2002}
+            name="Tender 5"
+            markerRef={tender5MarkerRef}
+            shipPosition={shipPosition}
+            pierLocation={pierLocation}
+          />
+        )}
+        {pierLocation && tender6Position && (
+          <PredictedMovingMarker
+            position={tender6Position}
+            sog={tender6Speed}
+            cog={tender6Heading}
+            lastReceived={tender6LastReceived}
+            icon={tenderIcon}
+            zIndexOffset={2002}
+            name="Tender 6"
+            markerRef={tender6MarkerRef}
+            shipPosition={shipPosition}
+            pierLocation={pierLocation}
+          />
+        )}
 
-                {pierLocation && tender3Position && (
-                    <PredictedMovingMarker
-                        position={tender3Position}
-                        sog={tender3Speed}
-                        cog={tender3Heading}
-                        lastReceived={tender3LastReceived}
-                        icon={tenderIcon}
-                        zIndexOffset={1001}
-                        name="Tender 3"
-                        markerRef={tender3MarkerRef}
-                        shipPosition={shipPosition}
-                        pierLocation={pierLocation}
-                    />
-                )}
-                {pierLocation && tender4Position && (
-                    <PredictedMovingMarker
-                        position={tender4Position}
-                        sog={tender4Speed}
-                        cog={tender4Heading}
-                        lastReceived={tender4LastReceived}
-                        icon={tenderIcon}
-                        zIndexOffset={2002}
-                        name="Tender 4"
-                        markerRef={tender4MarkerRef}
-                        shipPosition={shipPosition}
-                        pierLocation={pierLocation}
-                    />
-                )}
-                {pierLocation && tender5Position && (
-                    <PredictedMovingMarker
-                        position={tender5Position}
-                        sog={tender5Speed}
-                        cog={tender5Heading}
-                        lastReceived={tender5LastReceived}
-                        icon={tenderIcon}
-                        zIndexOffset={2002}
-                        name="Tender 5"
-                        markerRef={tender5MarkerRef}
-                        shipPosition={shipPosition}
-                        pierLocation={pierLocation}
-                    />
-                )}
-                {pierLocation && tender6Position && (
-                    <PredictedMovingMarker
-                        position={tender6Position}
-                        sog={tender6Speed}
-                        cog={tender6Heading}
-                        lastReceived={tender6LastReceived}
-                        icon={tenderIcon}
-                        zIndexOffset={2002}
-                        name="Tender 6"
-                        markerRef={tender6MarkerRef}
-                        shipPosition={shipPosition}
-                        pierLocation={pierLocation}
-                    />
-                )}
+        {pierLocation &&
+          Object.entries(zodiacs).map(([number, zodiac]) => (
+            <PredictedMovingMarker
+              key={`zodiac-${number}`}
+              position={zodiac.position}
+              sog={zodiac.speed}
+              cog={zodiac.heading}
+              lastReceived={zodiac.lastReceived}
+              icon={zodiacIcon}
+              zIndexOffset={3000 + Number(number)}
+              name={`Zodiac ${number}`}
+              markerRef={zodiacMarkerRefs.current[Number(number) - 1]}
+              shipPosition={shipPosition}
+              pierLocation={pierLocation}
+            />
+          ))}
 
-
-                {/* {shipPosition && (
+        {/* {shipPosition && (
                     <Marker
                         position={shipPosition}
                         icon={shipDotIcon}
@@ -372,26 +496,26 @@ const ShipMapRTDB = ({ pierLocation }) => {
                     />
                 )} */}
 
-                <LogZoom />
-            </MapContainer>
-        </>
-    );
+        <LogZoom />
+      </MapContainer>
+    </>
+  );
 };
 
 const LogZoom = () => {
-    const map = useMap();
-    useEffect(() => {
-        const onZoom = () => {
-            console.log('Current zoom:', map.getZoom());
-        };
-        map.on('zoomend', onZoom);
-        // Log initial zoom
-        console.log('Initial zoom:', map.getZoom());
-        return () => {
-            map.off('zoomend', onZoom);
-        };
-    }, [map]);
-    return null;
+  const map = useMap();
+  useEffect(() => {
+    const onZoom = () => {
+      console.log("Current zoom:", map.getZoom());
+    };
+    map.on("zoomend", onZoom);
+    // Log initial zoom
+    console.log("Initial zoom:", map.getZoom());
+    return () => {
+      map.off("zoomend", onZoom);
+    };
+  }, [map]);
+  return null;
 };
 
 export default ShipMapRTDB;
